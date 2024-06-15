@@ -1,5 +1,8 @@
+import 'dart:math';
+
+import 'package:cookmania/homepage/pilihan_bahan.dart';
+import 'package:cookmania/homepage/pilihan_negara.dart';
 import 'package:flutter/material.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,74 +16,29 @@ class _HomePageState extends State<HomePage> {
   final _koreaController = PageController();
   final _italyController = PageController();
 
+  final List<String> bahanIMG = <String>[
+    "chicken.png",
+    "beef.png",
+    "pork.png",
+    "fish.png",
+    "crab.png",
+    "shrimp.png"
+  ];
+  final List<String> bahanText = <String>[
+    "Ayam",
+    "Sapi",
+    "Babi",
+    "Ikan",
+    "Kepiting",
+    "Udang"
+  ];
+
   @override
   void dispose() {
     _japanController.dispose();
     _koreaController.dispose();
     _italyController.dispose();
     super.dispose();
-  }
-
-  Widget buildPageView(
-      PageController controller, List<Map<String, String>> images) {
-    return Column(
-      children: [
-        Expanded(
-          child: PageView(
-            controller: controller,
-            children: images.map((image) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10.0),
-                      child: Image.asset(
-                        image['path']!,
-                        width: MediaQuery.of(context).size.width,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0.0,
-                      left: 0.0,
-                      right: 0.0,
-                      child: Container(
-                        color: Colors.black.withOpacity(0.5),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 5.0, horizontal: 10.0),
-                        child: Text(
-                          image['name']!,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-        const SizedBox(height: 10.0),
-        SmoothPageIndicator(
-          controller: controller,
-          count: images.length,
-          effect: JumpingDotEffect(
-            activeDotColor: Colors.deepPurple,
-            dotColor: Colors.deepPurple.shade100,
-            dotHeight: 10,
-            dotWidth: 10,
-            spacing: 16,
-            verticalOffset: 10,
-            jumpScale: 1.5,
-          ),
-        ),
-      ],
-    );
   }
 
   @override
@@ -125,34 +83,74 @@ class _HomePageState extends State<HomePage> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      FilterChip(
-                        label: const Text('Ayam'),
-                        onSelected: (bool selected) {},
+                      OutlinedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey[300],
+                          shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0))),
+                        ),
+                        child: const Text(
+                          'Ayam',
+                          style: TextStyle(color: Colors.black),
+                        ),
                       ),
                       const SizedBox(width: 8.0),
-                      FilterChip(
-                        label: const Text('Sapi'),
-                        onSelected: (bool selected) {},
+                      OutlinedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey[300],
+                          shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0))),
+                        ),
+                        child: const Text(
+                          'Ikan',
+                          style: TextStyle(color: Colors.black),
+                        ),
                       ),
                       const SizedBox(width: 8.0),
-                      FilterChip(
-                        label: const Text('Kambing'),
-                        onSelected: (bool selected) {},
+                      OutlinedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey[300],
+                          shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0))),
+                        ),
+                        child: const Text(
+                          'Keju',
+                          style: TextStyle(color: Colors.black),
+                        ),
                       ),
                       const SizedBox(width: 8.0),
-                      FilterChip(
-                        label: const Text('Kangkung'),
-                        onSelected: (bool selected) {},
+                      OutlinedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey[300],
+                          shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0))),
+                        ),
+                        child: const Text(
+                          'Cokelat',
+                          style: TextStyle(color: Colors.black),
+                        ),
                       ),
                       const SizedBox(width: 8.0),
-                      FilterChip(
-                        label: const Text('Pisang'),
-                        onSelected: (bool selected) {},
-                      ),
-                      const SizedBox(width: 8.0),
-                      FilterChip(
-                        label: const Text('Telur'),
-                        onSelected: (bool selected) {},
+                      OutlinedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey[300],
+                          shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0))),
+                        ),
+                        child: const Text(
+                          'Tepung',
+                          style: TextStyle(color: Colors.black),
+                        ),
                       ),
                     ],
                   ),
@@ -162,84 +160,20 @@ class _HomePageState extends State<HomePage> {
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Pilihan Negara Lain',
+                    'Pilihan Negara',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                 ),
-                DefaultTabController(
-                  length: 3,
-                  child: Column(
-                    children: [
-                      const TabBar(
-                        tabs: [
-                          Tab(
-                            text: 'Japan',
-                          ),
-                          Tab(
-                            text: 'Korea',
-                          ),
-                          Tab(
-                            text: 'Italy',
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 300,
-                        child: TabBarView(
-                          children: [
-                            buildPageView(
-                              _japanController,
-                              [
-                                {
-                                  'path': 'lib/images/japan1.jpg',
-                                  'name': 'Salmon Sushi'
-                                },
-                                {
-                                  'path': 'lib/images/japan2.jpg',
-                                  'name': 'Niku Udon'
-                                },
-                              ],
-                            ),
-                            buildPageView(
-                              _koreaController,
-                              [
-                                {
-                                  'path': 'lib/images/korea1.jpg',
-                                  'name': 'Jjajangmyeon'
-                                },
-                                {
-                                  'path': 'lib/images/korea2.jpg',
-                                  'name': 'Tteokbokki'
-                                },
-                              ],
-                            ),
-                            buildPageView(
-                              _italyController,
-                              [
-                                {
-                                  'path': 'lib/images/itali1.jpg',
-                                  'name': 'Cheese Raviolli'
-                                },
-                                {
-                                  'path': 'lib/images/itali2.jpg',
-                                  'name': 'Delicious Tiramisu for Dessert'
-                                },
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // ----------------------------------List View----------------------------------
+                const PilihanNegara(),
+                // ----------------------------------Grid View----------------------------------
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Bahan Pilihan',
+                    'Pilihan Bahan',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                 ),
+                PilihanBahan(),
               ],
             ),
           ),

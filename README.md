@@ -1,1 +1,3 @@
-# ambw-project-cookmania
+# cookmania
+
+A new Flutter project.

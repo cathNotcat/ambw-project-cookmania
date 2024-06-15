@@ -25,3 +25,9 @@ flutter:
     - lib/images/japan2.jpg
     - lib/images/korea1.jpg
     - lib/images/korea2.jpg
+    - lib/images/chicken.png
+    - lib/images/beef.png
+    - lib/images/shrimp.png
+    - lib/images/fish.png
+    - lib/images/pork.png
+    - lib/images/crab.png
