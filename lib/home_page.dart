@@ -1,5 +1,6 @@
 import 'package:cookmania/homepage/pilihan_bahan.dart';
 import 'package:cookmania/homepage/pilihan_negara.dart';
+import 'package:cookmania/profilepage/profile_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -10,6 +11,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int pilihanMenu = 0;
+
   final _japanController = PageController();
   final _koreaController = PageController();
   final _italyController = PageController();
@@ -41,141 +44,195 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 50.0, left: 16.0, right: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // ----------------------------------TITLE----------------------------------
-                const Center(
-                  child: Text(
-                    "COOKMANIA",
-                    style:
-                        TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
-                  ),
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 50.0, left: 16.0, right: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // ----------------------------------TITLE----------------------------------
+              const Center(
+                child: Text(
+                  "COOKMANIA",
+                  style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 20.0),
-                // ----------------------------------SEARCH BAR----------------------------------
-                Container(
-                  height: 40.0,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(color: Colors.grey),
-                  ),
-                  child: const Center(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Ketikkan bahan...',
-                        hintStyle: TextStyle(fontSize: 16.0),
-                        prefixIcon: Icon(Icons.search),
-                        border: InputBorder.none,
-                      ),
+              ),
+              const SizedBox(height: 20.0),
+              // ----------------------------------SEARCH BAR----------------------------------
+              Container(
+                height: 40.0,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(color: Colors.grey),
+                ),
+                child: const Center(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Ketikkan bahan...',
+                      hintStyle: TextStyle(fontSize: 16.0),
+                      prefixIcon: Icon(Icons.search),
+                      border: InputBorder.none,
                     ),
                   ),
                 ),
-                const SizedBox(height: 20.0),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      OutlinedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey[300],
-                          shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0))),
-                        ),
-                        child: const Text(
-                          'Ayam',
-                          style: TextStyle(color: Colors.black),
-                        ),
+              ),
+              const SizedBox(height: 20.0),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    OutlinedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[300],
+                        shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0))),
                       ),
-                      const SizedBox(width: 8.0),
-                      OutlinedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey[300],
-                          shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0))),
-                        ),
-                        child: const Text(
-                          'Ikan',
-                          style: TextStyle(color: Colors.black),
-                        ),
+                      child: const Text(
+                        'Ayam',
+                        style: TextStyle(color: Colors.black),
                       ),
-                      const SizedBox(width: 8.0),
-                      OutlinedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey[300],
-                          shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0))),
-                        ),
-                        child: const Text(
-                          'Keju',
-                          style: TextStyle(color: Colors.black),
-                        ),
+                    ),
+                    const SizedBox(width: 8.0),
+                    OutlinedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[300],
+                        shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0))),
                       ),
-                      const SizedBox(width: 8.0),
-                      OutlinedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey[300],
-                          shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0))),
-                        ),
-                        child: const Text(
-                          'Cokelat',
-                          style: TextStyle(color: Colors.black),
-                        ),
+                      child: const Text(
+                        'Ikan',
+                        style: TextStyle(color: Colors.black),
                       ),
-                      const SizedBox(width: 8.0),
-                      OutlinedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey[300],
-                          shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0))),
-                        ),
-                        child: const Text(
-                          'Tepung',
-                          style: TextStyle(color: Colors.black),
-                        ),
+                    ),
+                    const SizedBox(width: 8.0),
+                    OutlinedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[300],
+                        shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0))),
                       ),
-                    ],
-                  ),
+                      child: const Text(
+                        'Keju',
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    const SizedBox(width: 8.0),
+                    OutlinedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[300],
+                        shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0))),
+                      ),
+                      child: const Text(
+                        'Cokelat',
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    const SizedBox(width: 8.0),
+                    OutlinedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[300],
+                        shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0))),
+                      ),
+                      child: const Text(
+                        'Tepung',
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 20.0),
-                // ----------------------------------TAB BAR----------------------------------
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Pilihan Negara',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
+              ),
+              const SizedBox(height: 20.0),
+              // ----------------------------------TAB BAR----------------------------------
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Pilihan Negara',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                 ),
-                const PilihanNegara(),
-                // ----------------------------------Grid View----------------------------------
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Pilihan Bahan',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
+              ),
+              const PilihanNegara(),
+              // ----------------------------------Grid View----------------------------------
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Pilihan Bahan',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                 ),
-                PilihanBahan(),
-              ],
-            ),
+              ),
+              PilihanBahan(),
+            ],
           ),
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+              label: "Home", icon: Icon(Icons.home_outlined)),
+          BottomNavigationBarItem(
+              label: "Search", icon: Icon(Icons.search_outlined)),
+          BottomNavigationBarItem(
+              label: "Upload", icon: Icon(Icons.add_box_rounded)),
+          BottomNavigationBarItem(
+              label: "Archive", icon: Icon(Icons.bookmark_outline)),
+          BottomNavigationBarItem(
+              label: "Profile", icon: Icon(Icons.person_2_outlined)),
+        ],
+        currentIndex: pilihanMenu,
+        onTap: (int index) {
+          setState(() {
+            pilihanMenu = index;
+          });
+          debugPrint(index.toString());
+          switch (index) {
+            case 0:
+              break;
+            case 1:
+              // Navigator.of(context).push(
+              //   MaterialPageRoute(
+              //     builder: (context) => ,
+              //   ),
+              // );
+              break;
+            case 2:
+              // Navigator.of(context).push(
+              //   MaterialPageRoute(
+              //     builder: (context) => BookmarkPage(),
+              //   ),
+              // );
+              break;
+            case 3:
+              // Navigator.of(context).push(
+              //   MaterialPageRoute(
+              //     builder: (context) => TopFoodPage(),
+              //   ),
+              // );
+              break;
+            case 4:
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const ProfilePage(),
+                ),
+              );
+              break;
+          }
+        },
+        selectedItemColor: Colors.yellow.shade800,
+        unselectedItemColor: Colors.grey,
+        selectedLabelStyle: TextStyle(color: Colors.yellow.shade800),
+        showUnselectedLabels: true,
       ),
     );
   }

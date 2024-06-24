@@ -1,4 +1,6 @@
 import 'package:cookmania/home_page.dart';
+import 'package:cookmania/profilepage/profile_page.dart';
+import 'package:cookmania/profilepage/register_page.dart';
 // import 'package:cookmania/register_page.dart';
 // import 'package:cookmania/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -20,8 +22,8 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
-      // home: RegisterPage(),
+      // home: HomePage(),
+      home: RegisterPage(),
     );
   }
 }
