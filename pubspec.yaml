@@ -19,12 +19,15 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - lib/images/itali1.jpg
-    - lib/images/itali2.jpg
+    - lib/images/indo1.jpg
+    - lib/images/indo2.jpg
+    - lib/images/indo3.jpg
     - lib/images/japan1.jpg
     - lib/images/japan2.jpg
-    - lib/images/korea1.jpg
-    - lib/images/korea2.jpg
+    - lib/images/japan3.jpg
+    - lib/images/chinese1.jpg
+    - lib/images/chinese2.jpg
+    - lib/images/chinese3.jpg
     - lib/images/chicken.png
     - lib/images/beef.png
     - lib/images/shrimp.png

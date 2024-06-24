@@ -1,5 +1,6 @@
 import 'package:cookmania/home_page.dart';
 import 'package:cookmania/login_page.dart';
+// import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -15,6 +16,9 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  // DatabaseReference _profileRef =
+  //     FirebaseDatabase.instance.reference().child('profile');
 
   @override
   void dispose() {
@@ -33,16 +37,31 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  void _register() {
-    if (_formKey.currentState!.validate()) {
-      print("to login page");
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => const HomePage(),
-        ),
-      );
-    }
-  }
+  // void _register() {
+  //   if (_formKey.currentState!.validate()) {
+  //     String username = _usernameController.text.trim();
+  //     String email = _emailController.text.trim();
+  //     String password = _passwordController.text;
+
+  //     // Generate a unique key for the user
+  //     String userId = _profileRef.push().key ?? '';
+
+  //     // Save user data to Firebase Realtime Database
+  //     _profileRef.child(userId).set({
+  //       'username': username,
+  //       'email': email,
+  //       'password': password,
+  //     }).then((value) {
+  //       // Navigate to home page or show success message
+  //       print('User registered successfully');
+  //       // Navigate to another page or show success message
+  //       Navigator.of(context).pop(); // Example: Navigate back to login page
+  //     }).catchError((error) {
+  //       print('Failed to register user: $error');
+  //       // Handle error, show error message to user, etc.
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +156,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    onPressed: _register,
+                    onPressed: () {},
                     child: const Text('Register'),
                   ),
                 ),

@@ -15,13 +15,13 @@ class PilihanNegara extends StatelessWidget {
             TabBar(
               tabs: [
                 Tab(
-                  text: 'Japan',
+                  text: 'Indonesian',
                 ),
                 Tab(
-                  text: 'Korea',
+                  text: 'Chinese',
                 ),
                 Tab(
-                  text: 'Italy',
+                  text: 'Japanese',
                 ),
               ],
             ),
@@ -31,31 +31,49 @@ class PilihanNegara extends StatelessWidget {
                 children: [
                   PageViewWidget(
                     images: [
-                      {'path': 'lib/images/japan1.jpg', 'name': 'Salmon Sushi'},
+                      {
+                        'path': 'lib/images/indo1.jpg',
+                        'name': 'Nasi Goreng Abang2'
+                      },
+                      {
+                        'path': 'lib/images/indo2.jpg',
+                        'name': 'Nasi Goreng Ayam'
+                      },
+                      {
+                        'path': 'lib/images/indo3.jpg',
+                        'name': 'Dori Telur Asin'
+                      },
+                    ],
+                  ),
+                  PageViewWidget(
+                    images: [
+                      {
+                        'path': 'lib/images/chinese1.jpg',
+                        'name': 'Nasi Goreng Kepiting'
+                      },
+                      {
+                        'path': 'lib/images/chinese2.jpg',
+                        'name': 'Nasi Goreng Lapjiong'
+                      },
+                      {
+                        'path': 'lib/images/chinese3.jpg',
+                        'name': 'Ayam Saos Inggris'
+                      },
+                    ],
+                  ),
+                  PageViewWidget(
+                    images: [
+                      {
+                        'path': 'lib/images/japan1.jpg',
+                        'name': 'Ayam Tepanyaki'
+                      },
                       {
                         'path': 'lib/images/japan2.jpg',
-                        'name': 'Homemade Beef Gyudon'
-                      },
-                    ],
-                  ),
-                  PageViewWidget(
-                    images: [
-                      {
-                        'path': 'lib/images/korea1.jpg',
-                        'name': 'Korean Spicy Chicken'
-                      },
-                      {'path': 'lib/images/korea2.jpg', 'name': 'Tteokbokki'},
-                    ],
-                  ),
-                  PageViewWidget(
-                    images: [
-                      {
-                        'path': 'lib/images/itali1.jpg',
-                        'name': 'Cheese Raviolli'
+                        'name': 'Sapi Tepanyaki'
                       },
                       {
-                        'path': 'lib/images/itali2.jpg',
-                        'name': 'Delicious Tiramisu for Dessert'
+                        'path': 'lib/images/japan3.jpg',
+                        'name': 'Udang Tempura'
                       },
                     ],
                   ),
