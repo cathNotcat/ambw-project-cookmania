@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "290024013907",
+    "firebase_url": "https://flutter-cookmania-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "flutter-cookmania",
+    "storage_bucket": "flutter-cookmania.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:290024013907:android:c67a3abdf764eadef146a6",
+        "android_client_info": {
+          "package_name": "com.example.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGUDzkaEaMfHUNk20p4BF8Y6q8pOSGAGE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

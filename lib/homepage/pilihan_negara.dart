@@ -1,18 +1,53 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class PilihanNegara extends StatelessWidget {
+class PilihanNegara extends StatefulWidget {
   const PilihanNegara({super.key});
+
+  @override
+  State<PilihanNegara> createState() => _PilihanNegaraState();
+}
+
+class _PilihanNegaraState extends State<PilihanNegara> {
+  final DatabaseReference _dbref =
+      FirebaseDatabase.instance.ref().child('resep');
+
+  late Future<Map<String, List<Map<String, String>>>> _dataFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _dataFuture = fetchDataFromFirebase();
+  }
+
+  Future<Map<String, List<Map<String, String>>>> fetchDataFromFirebase() async {
+    DataSnapshot snapshot = await _dbref.get();
+    Map<String, List<Map<String, String>>> data = {};
+    snapshot.children.forEach((recipeSnapshot) {
+      String country = recipeSnapshot.child('negara').value as String;
+      String title = recipeSnapshot.child('judul').value as String;
+      String path = recipeSnapshot.child('path').value
+          as String; // Assuming you also store the image path
+
+      if (!data.containsKey(country)) {
+        data[country] = [];
+      }
+      data[country]!.add({'path': path, 'name': title});
+    });
+    return data;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      child: const DefaultTabController(
+      child: DefaultTabController(
         length: 3,
         child: Column(
           children: [
-            TabBar(
+            const TabBar(
               tabs: [
                 Tab(
                   text: 'Indonesian',
@@ -25,59 +60,29 @@ class PilihanNegara extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Expanded(
-              child: TabBarView(
-                children: [
-                  PageViewWidget(
-                    images: [
-                      {
-                        'path': 'lib/images/indo1.jpg',
-                        'name': 'Nasi Goreng Abang2'
-                      },
-                      {
-                        'path': 'lib/images/indo2.jpg',
-                        'name': 'Nasi Goreng Ayam'
-                      },
-                      {
-                        'path': 'lib/images/indo3.jpg',
-                        'name': 'Dori Telur Asin'
-                      },
-                    ],
-                  ),
-                  PageViewWidget(
-                    images: [
-                      {
-                        'path': 'lib/images/chinese1.jpg',
-                        'name': 'Nasi Goreng Kepiting'
-                      },
-                      {
-                        'path': 'lib/images/chinese2.jpg',
-                        'name': 'Nasi Goreng Lapjiong'
-                      },
-                      {
-                        'path': 'lib/images/chinese3.jpg',
-                        'name': 'Ayam Saos Inggris'
-                      },
-                    ],
-                  ),
-                  PageViewWidget(
-                    images: [
-                      {
-                        'path': 'lib/images/japan1.jpg',
-                        'name': 'Ayam Tepanyaki'
-                      },
-                      {
-                        'path': 'lib/images/japan2.jpg',
-                        'name': 'Sapi Tepanyaki'
-                      },
-                      {
-                        'path': 'lib/images/japan3.jpg',
-                        'name': 'Udang Tempura'
-                      },
-                    ],
-                  ),
-                ],
+              child: FutureBuilder<Map<String, List<Map<String, String>>>>(
+                future: _dataFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return const Center(child: Text('Error loading data'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text('No data available'));
+                  } else {
+                    return TabBarView(
+                      children: [
+                        PageViewWidget(
+                            images: snapshot.data!['Indonesian'] ?? []),
+                        PageViewWidget(images: snapshot.data!['Chinese'] ?? []),
+                        PageViewWidget(
+                            images: snapshot.data!['Japanese'] ?? []),
+                      ],
+                    );
+                  }
+                },
               ),
             ),
           ],
