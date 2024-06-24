@@ -1,6 +1,5 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class PilihanNegara extends StatefulWidget {
@@ -11,7 +10,7 @@ class PilihanNegara extends StatefulWidget {
 }
 
 class _PilihanNegaraState extends State<PilihanNegara> {
-  final DatabaseReference _dbref =
+  final DatabaseReference _dbRef =
       FirebaseDatabase.instance.ref().child('resep');
 
   late Future<Map<String, List<Map<String, String>>>> _dataFuture;
@@ -19,75 +18,82 @@ class _PilihanNegaraState extends State<PilihanNegara> {
   @override
   void initState() {
     super.initState();
-    _dataFuture = fetchDataFromFirebase();
+    _dataFuture = _getData();
   }
 
-  Future<Map<String, List<Map<String, String>>>> fetchDataFromFirebase() async {
-    DataSnapshot snapshot = await _dbref.get();
-    Map<String, List<Map<String, String>>> data = {};
-    snapshot.children.forEach((recipeSnapshot) {
-      String country = recipeSnapshot.child('negara').value as String;
-      String title = recipeSnapshot.child('judul').value as String;
-      String path = recipeSnapshot.child('path').value
-          as String; // Assuming you also store the image path
+  Future<Map<String, List<Map<String, String>>>> _getData() async {
+    DataSnapshot snapshot = await _dbRef.get();
+    Map<String, List<Map<String, String>>> data = {
+      'Indonesian': [],
+      'Chinese': [],
+      'Japanese': [],
+    };
 
-      if (!data.containsKey(country)) {
-        data[country] = [];
+    for (var entry in snapshot.children) {
+      String? negara = entry.child('negara').value as String?;
+      String? judul = entry.child('judul').value as String?;
+      String? foto = entry.child('foto').value as String?;
+      // print('Judul: $judul, Foto: $foto, Negara: $negara');
+
+      if (negara != null && judul != null && foto != null) {
+        Map<String, String> item = {
+          'path': 'lib/images/$foto',
+          'name': judul,
+        };
+
+        if (negara.toLowerCase() == 'indonesian') {
+          data['Indonesian']!.add(item);
+        } else if (negara.toLowerCase() == 'chinese') {
+          data['Chinese']!.add(item);
+        } else if (negara.toLowerCase() == 'japanese') {
+          data['Japanese']!.add(item);
+        }
       }
-      data[country]!.add({'path': path, 'name': title});
-    });
+    }
     return data;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      child: DefaultTabController(
-        length: 3,
-        child: Column(
-          children: [
-            const TabBar(
-              tabs: [
-                Tab(
-                  text: 'Indonesian',
-                ),
-                Tab(
-                  text: 'Chinese',
-                ),
-                Tab(
-                  text: 'Japanese',
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: FutureBuilder<Map<String, List<Map<String, String>>>>(
-                future: _dataFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return const Center(child: Text('Error loading data'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text('No data available'));
-                  } else {
-                    return TabBarView(
+    return FutureBuilder<Map<String, List<Map<String, String>>>>(
+      future: _dataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else {
+          Map<String, List<Map<String, String>>> data = snapshot.data!;
+
+          return SizedBox(
+            height: 300,
+            child: DefaultTabController(
+              length: 3,
+              child: Column(
+                children: [
+                  const TabBar(
+                    tabs: [
+                      Tab(text: 'Indonesian'),
+                      Tab(text: 'Chinese'),
+                      Tab(text: 'Japanese'),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Expanded(
+                    child: TabBarView(
                       children: [
-                        PageViewWidget(
-                            images: snapshot.data!['Indonesian'] ?? []),
-                        PageViewWidget(images: snapshot.data!['Chinese'] ?? []),
-                        PageViewWidget(
-                            images: snapshot.data!['Japanese'] ?? []),
+                        PageViewWidget(images: data['Indonesian']!),
+                        PageViewWidget(images: data['Chinese']!),
+                        PageViewWidget(images: data['Japanese']!),
                       ],
-                    );
-                  }
-                },
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
+          );
+        }
+      },
     );
   }
 }

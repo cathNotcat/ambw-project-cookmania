@@ -23,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
 
   void _login() {
     if (_formKey.currentState!.validate()) {
-      print("to home page");
+      // print("to home page");
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => const HomePage(),
@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _register() {
-    print("to register page");
+    // print("to register page");
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const RegisterPage(),

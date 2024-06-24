@@ -22,7 +22,7 @@ class PilihanBahan extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 310,
       child: GridView.count(
         primary: false,
