@@ -1,6 +1,7 @@
 import 'package:cookmania/home_page.dart';
 import 'package:cookmania/profilepage/profile_page.dart';
 import 'package:cookmania/profilepage/register_page.dart';
+import 'package:cookmania/recipe_page.dart';
 // import 'package:cookmania/register_page.dart';
 // import 'package:cookmania/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -23,7 +24,8 @@ class MainApp extends StatelessWidget {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       // home: HomePage(),
-      home: RegisterPage(),
+      // home: RegisterPage(),
+      home: RecipePage(),
     );
   }
 }
