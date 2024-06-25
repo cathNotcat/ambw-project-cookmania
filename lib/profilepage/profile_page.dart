@@ -15,6 +15,10 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final DatabaseReference _dbRef =
       FirebaseDatabase.instance.ref().child('profile');
+
+  final DatabaseReference _dbResepRef =
+      FirebaseDatabase.instance.ref().child('resep');
+
   late Future<Map<String, String>> _dataFuture;
 
   String? _username;
@@ -30,6 +34,7 @@ class _ProfilePageState extends State<ProfilePage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _username = prefs.getString('username');
+      print('username: $_username');
       _dataFuture = _getData();
     });
   }
@@ -78,13 +83,18 @@ class _ProfilePageState extends State<ProfilePage> {
             FutureBuilder<Map<String, String>>(
               future: _dataFuture,
               builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                if (_username == null) {
                   return _loggedOut();
                 } else {
                   return _loggedIn(snapshot.data!);
                 }
+                // if (snapshot.hasError) {
+                //   return Center(child: Text('Error: ${snapshot.error}'));
+                // } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                //   return _loggedOut();
+                // } else {
+                //   return _loggedIn(snapshot.data!);
+                // }
               },
             ),
           ],
@@ -171,74 +181,124 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _loggedIn(Map<String, String> userData) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "${userData['nama']}",
-          style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-        ),
-        Text(
-          "@${userData['username']}",
-          style: const TextStyle(fontSize: 18.0),
-        ),
-        const Divider(height: 20, thickness: 1),
-        const SizedBox(height: 10.0),
-        const Text(
-          "Resep saya",
-          style: TextStyle(fontSize: 20.0),
-        ),
-        const SizedBox(height: 20.0),
-        SizedBox(
-          width: double.infinity,
-          child: Row(
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Image.asset(
-                'lib/images/indo1.jpg',
-                width: 150,
-                fit: BoxFit.cover,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(50.0),
+                child: Image.asset(
+                  'lib/images/foto.png',
+                  width: 80,
+                  fit: BoxFit.cover,
+                ),
               ),
-              const SizedBox(width: 10),
-              Wrap(
-                direction: Axis.vertical,
+              const SizedBox(width: 20),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    constraints: const BoxConstraints(maxWidth: 200),
-                    child: const Text(
-                      "Judul",
-                      style: TextStyle(
-                          fontSize: 16.0, fontWeight: FontWeight.bold),
-                    ),
+                  Text(
+                    "${userData['nama']}",
+                    style: const TextStyle(
+                        fontSize: 20.0, fontWeight: FontWeight.bold),
                   ),
-                  Container(
-                    constraints: const BoxConstraints(maxWidth: 200),
-                    child: const Text(
-                      "Deskripsi panjang yang seharusnya membungkus ke baris berikutnya jika tidak ada cukup ruang di satu baris.",
-                    ),
+                  Text(
+                    "@${userData['username']}",
+                    style: const TextStyle(fontSize: 18.0),
                   ),
                 ],
               ),
             ],
           ),
-        ),
-        const SizedBox(height: 40.0),
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton(
-              onPressed: () async {
-                _logout();
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const LoginPage()));
+
+          const SizedBox(height: 40.0),
+          const Text(
+            "Resep saya",
+            style: TextStyle(fontSize: 20.0),
+          ),
+          const SizedBox(height: 20.0),
+          Container(
+            height: 300,
+            child: ListView.builder(
+              itemCount: 5,
+              itemBuilder: (context, index) {
+                return const Column(
+                  children: [
+                    ListTile(
+                      title: Text(
+                        'Title',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Content',
+                            maxLines: 2,
+                          ),
+                          SizedBox(height: 4),
+                        ],
+                      ),
+                    ),
+                    Divider(height: 1, thickness: 1, color: Colors.grey),
+                  ],
+                );
               },
-              style: FilledButton.styleFrom(
-                  backgroundColor: Colors.yellow[800],
-                  foregroundColor: Colors.black),
-              child: const Text(
-                "Log Out",
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-              )),
-        ),
-      ],
+            ),
+          ),
+          // SizedBox(
+          //   width: double.infinity,
+          //   child: Row(
+          //     children: [
+          //       Image.asset(
+          //         'lib/images/indo1.jpg',
+          //         width: 150,
+          //         fit: BoxFit.cover,
+          //       ),
+          //       const SizedBox(width: 10),
+          //       Wrap(
+          //         direction: Axis.vertical,
+          //         children: [
+          //           Container(
+          //             constraints: const BoxConstraints(maxWidth: 200),
+          //             child: const Text(
+          //               "Judul",
+          //               style: TextStyle(
+          //                   fontSize: 16.0, fontWeight: FontWeight.bold),
+          //             ),
+          //           ),
+          //           Container(
+          //             constraints: const BoxConstraints(maxWidth: 200),
+          //             child: const Text(
+          //               "Deskripsi panjang yang seharusnya membungkus ke baris berikutnya jika tidak ada cukup ruang di satu baris.",
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //     ],
+          //   ),
+          // ),
+          const SizedBox(height: 40.0),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+                onPressed: () async {
+                  _logout();
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const LoginPage()));
+                },
+                style: FilledButton.styleFrom(
+                    backgroundColor: Colors.yellow[800],
+                    foregroundColor: Colors.black),
+                child: const Text(
+                  "Log Out",
+                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                )),
+          ),
+        ],
+      ),
     );
   }
 }
