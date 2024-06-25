@@ -1,6 +1,7 @@
 import 'package:cookmania/homepage/pilihan_bahan.dart';
 import 'package:cookmania/homepage/pilihan_negara.dart';
 import 'package:cookmania/profilepage/profile_page.dart';
+import 'package:cookmania/search/searchKetik_page.dart'; // Import the SearchKetikPage
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -60,19 +61,29 @@ class _HomePageState extends State<HomePage> {
               ),
               const SizedBox(height: 20.0),
               // ----------------------------------SEARCH BAR----------------------------------
-              Container(
-                height: 40.0,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0),
-                  border: Border.all(color: Colors.grey),
-                ),
-                child: const Center(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Ketikkan bahan...',
-                      hintStyle: TextStyle(fontSize: 16.0),
-                      prefixIcon: Icon(Icons.search),
-                      border: InputBorder.none,
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const SearchKetikPage(),
+                    ),
+                  );
+                },
+                child: Container(
+                  height: 40.0,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.0),
+                    border: Border.all(color: Colors.grey),
+                  ),
+                  child: const Center(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Ketikkan bahan...',
+                        hintStyle: TextStyle(fontSize: 16.0),
+                        prefixIcon: Icon(Icons.search),
+                        border: InputBorder.none,
+                      ),
+                      enabled: false, // Disable the TextField to prevent editing
                     ),
                   ),
                 ),
@@ -200,23 +211,23 @@ class _HomePageState extends State<HomePage> {
             case 0:
               break;
             case 1:
-              // Navigator.of(context).push(
-              //   MaterialPageRoute(
-              //     builder: (context) => ,
-              //   ),
-              // );
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const SearchKetikPage(),
+                ),
+              );
               break;
             case 2:
               // Navigator.of(context).push(
               //   MaterialPageRoute(
-              //     builder: (context) => BookmarkPage(),
+              //     builder: (context) => UploadPage(),
               //   ),
               // );
               break;
             case 3:
               // Navigator.of(context).push(
               //   MaterialPageRoute(
-              //     builder: (context) => TopFoodPage(),
+              //     builder: (context) => ArchivePage(),
               //   ),
               // );
               break;
