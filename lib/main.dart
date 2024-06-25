@@ -1,3 +1,4 @@
+import 'package:cookmania/archive_page.dart';
 import 'package:cookmania/home_page.dart';
 import 'package:cookmania/profilepage/login_page.dart';
 import 'package:cookmania/profilepage/profile_page.dart';
@@ -23,7 +24,8 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       // home: HomePage(),
       // home: ProfilePage(),
-      home: LoginPage(),
+      // home: LoginPage(),
+      home: ArchivePage(),
       // home: RecipePage(),
     );
   }

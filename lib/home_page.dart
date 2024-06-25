@@ -1,3 +1,4 @@
+import 'package:cookmania/archive_page.dart';
 import 'package:cookmania/homepage/pilihan_bahan.dart';
 import 'package:cookmania/homepage/pilihan_negara.dart';
 import 'package:cookmania/profilepage/profile_page.dart';
@@ -83,7 +84,8 @@ class _HomePageState extends State<HomePage> {
                         prefixIcon: Icon(Icons.search),
                         border: InputBorder.none,
                       ),
-                      enabled: false, // Disable the TextField to prevent editing
+                      enabled:
+                          false, // Disable the TextField to prevent editing
                     ),
                   ),
                 ),
@@ -206,7 +208,7 @@ class _HomePageState extends State<HomePage> {
           setState(() {
             pilihanMenu = index;
           });
-          debugPrint(index.toString());
+
           switch (index) {
             case 0:
               break;
@@ -225,11 +227,11 @@ class _HomePageState extends State<HomePage> {
               // );
               break;
             case 3:
-              // Navigator.of(context).push(
-              //   MaterialPageRoute(
-              //     builder: (context) => ArchivePage(),
-              //   ),
-              // );
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const ArchivePage(),
+                ),
+              );
               break;
             case 4:
               Navigator.of(context).push(

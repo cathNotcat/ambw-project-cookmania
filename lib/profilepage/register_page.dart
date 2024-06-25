@@ -95,7 +95,7 @@ class _RegisterPageState extends State<RegisterPage> {
           );
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => const HomePage(),
+              builder: (context) => const LoginPage(),
             ),
           );
         }).catchError((error) {

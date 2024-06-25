@@ -1,6 +1,8 @@
+import 'package:cookmania/archive_page.dart';
 import 'package:cookmania/home_page.dart';
 import 'package:cookmania/profilepage/login_page.dart';
 import 'package:cookmania/profilepage/register_page.dart';
+import 'package:cookmania/search/searchKetik_page.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,13 +23,17 @@ class _ProfilePageState extends State<ProfilePage> {
 
   late Future<Map<String, String>> _dataFuture;
 
+  late Future<Map<String, List<Map<String, String>>>> _resepFuture;
+
   String? _username;
+  String? _userkey;
 
   @override
   void initState() {
     super.initState();
     _loadUsername();
     _dataFuture = _getData();
+    _resepFuture = _getResepData();
   }
 
   Future<void> _loadUsername() async {
@@ -36,7 +42,35 @@ class _ProfilePageState extends State<ProfilePage> {
       _username = prefs.getString('username');
       print('username: $_username');
       _dataFuture = _getData();
+      _resepFuture = _getResepData();
     });
+  }
+
+  Future<Map<String, List<Map<String, String>>>> _getResepData() async {
+    DataSnapshot snapshot = await _dbResepRef.get();
+    Map<String, List<Map<String, String>>> data = {
+      'resep': [],
+    };
+
+    for (var entry in snapshot.children) {
+      String? idCreator = entry.child('id_creator').value as String?;
+      String? judul = entry.child('judul').value as String?;
+      String? deskripsi = entry.child('deskripsi').value as String?;
+      String? foto = entry.child('foto').value as String?;
+
+      if (idCreator == _userkey &&
+          deskripsi != null &&
+          judul != null &&
+          foto != null) {
+        Map<String, String> item = {
+          'judul': judul,
+          'deskripsi': deskripsi,
+          'foto': 'lib/images/$foto',
+        };
+        data['resep']?.add(item);
+      }
+    }
+    return data;
   }
 
   Future<Map<String, String>> _getData() async {
@@ -51,6 +85,7 @@ class _ProfilePageState extends State<ProfilePage> {
         Map<dynamic, dynamic> data = snapshot.value as Map;
         Map<String, String> userData = {};
         data.forEach((key, value) {
+          _userkey = key;
           userData['nama'] = value['nama'];
           userData['username'] = value['username'];
         });
@@ -124,10 +159,20 @@ class _ProfilePageState extends State<ProfilePage> {
               );
               break;
             case 1:
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const SearchKetikPage(),
+                ),
+              );
               break;
             case 2:
               break;
             case 3:
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const ArchivePage(),
+                ),
+              );
               break;
             case 4:
               break;
@@ -181,123 +226,145 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _loggedIn(Map<String, String> userData) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(50.0),
-                child: Image.asset(
-                  'lib/images/foto.png',
-                  width: 80,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              const SizedBox(width: 20),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${userData['nama']}",
-                    style: const TextStyle(
-                        fontSize: 20.0, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    "@${userData['username']}",
-                    style: const TextStyle(fontSize: 18.0),
-                  ),
-                ],
-              ),
-            ],
-          ),
+    return FutureBuilder<Map<String, List<Map<String, String>>>>(
+      future: _resepFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else {
+          Map<String, List<Map<String, String>>> data = snapshot.data!;
 
-          const SizedBox(height: 40.0),
-          const Text(
-            "Resep saya",
-            style: TextStyle(fontSize: 20.0),
-          ),
-          const SizedBox(height: 20.0),
-          Container(
-            height: 300,
-            child: ListView.builder(
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                return const Column(
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    ListTile(
-                      title: Text(
-                        'Title',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Content',
-                            maxLines: 2,
-                          ),
-                          SizedBox(height: 4),
-                        ],
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(50.0),
+                      child: Image.asset(
+                        'lib/images/foto.png',
+                        width: 80,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    Divider(height: 1, thickness: 1, color: Colors.grey),
+                    const SizedBox(width: 20),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${userData['nama']}",
+                          style: const TextStyle(
+                              fontSize: 20.0, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          "@${userData['username']}",
+                          style: const TextStyle(fontSize: 18.0),
+                        ),
+                      ],
+                    ),
                   ],
-                );
-              },
+                ),
+                const SizedBox(height: 40.0),
+                const Text(
+                  "Resep saya",
+                  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                ),
+                // const SizedBox(height: 10.0),
+                ResepWidget(details: data['resep']!),
+                const SizedBox(height: 40.0),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                      onPressed: () async {
+                        _logout();
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const LoginPage()));
+                      },
+                      style: FilledButton.styleFrom(
+                          backgroundColor: Colors.yellow[800],
+                          foregroundColor: Colors.black),
+                      child: const Text(
+                        "Log Out",
+                        style: TextStyle(
+                            fontSize: 16.0, fontWeight: FontWeight.bold),
+                      )),
+                ),
+              ],
             ),
-          ),
-          // SizedBox(
-          //   width: double.infinity,
-          //   child: Row(
-          //     children: [
-          //       Image.asset(
-          //         'lib/images/indo1.jpg',
-          //         width: 150,
-          //         fit: BoxFit.cover,
-          //       ),
-          //       const SizedBox(width: 10),
-          //       Wrap(
-          //         direction: Axis.vertical,
-          //         children: [
-          //           Container(
-          //             constraints: const BoxConstraints(maxWidth: 200),
-          //             child: const Text(
-          //               "Judul",
-          //               style: TextStyle(
-          //                   fontSize: 16.0, fontWeight: FontWeight.bold),
-          //             ),
-          //           ),
-          //           Container(
-          //             constraints: const BoxConstraints(maxWidth: 200),
-          //             child: const Text(
-          //               "Deskripsi panjang yang seharusnya membungkus ke baris berikutnya jika tidak ada cukup ruang di satu baris.",
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //     ],
-          //   ),
-          // ),
-          const SizedBox(height: 40.0),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-                onPressed: () async {
-                  _logout();
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const LoginPage()));
-                },
-                style: FilledButton.styleFrom(
-                    backgroundColor: Colors.yellow[800],
-                    foregroundColor: Colors.black),
-                child: const Text(
-                  "Log Out",
-                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-                )),
-          ),
-        ],
+          );
+        }
+      },
+    );
+  }
+}
+
+class ResepWidget extends StatelessWidget {
+  final List<Map<String, String>> details;
+
+  const ResepWidget({required this.details, Key? key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 400,
+      child: ListView.builder(
+        itemCount: details.length,
+        itemBuilder: (context, index) {
+          if (index >= details.length) {
+            return Container();
+          }
+          return Column(
+            children: [
+              SizedBox(
+                width: double.infinity,
+                child: Card(
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            bottomLeft: Radius.circular(10)),
+                        child: Image.asset(
+                          details[index]['foto']!,
+                          width: 150,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              constraints: const BoxConstraints(maxWidth: 200),
+                              child: Text(
+                                details[index]['judul']!,
+                                style: const TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Container(
+                              constraints: const BoxConstraints(maxWidth: 200),
+                              child: Text(
+                                details[index]['deskripsi']!,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
