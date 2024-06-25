@@ -2,11 +2,13 @@ import 'package:cookmania/home_page.dart';
 import 'package:cookmania/profilepage/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _LoginPageState createState() => _LoginPageState();
 }
 
@@ -15,7 +17,6 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final DatabaseReference _profileRef =
-      // FirebaseDatabase.instance.ref().child('profile').child('users');
       FirebaseDatabase.instance.ref().child('profile');
 
   @override
@@ -25,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _login() {
+  Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       String username = _usernameController.text.trim();
       String password = _passwordController.text;
@@ -34,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
           .orderByChild('username')
           .equalTo(username)
           .once()
-          .then((DatabaseEvent event) {
+          .then((DatabaseEvent event) async {
         dynamic snapshotValue = event.snapshot.value;
         if (snapshotValue != null && snapshotValue is Map<dynamic, dynamic>) {
           Map<dynamic, dynamic> users = snapshotValue;
@@ -46,56 +47,26 @@ class _LoginPageState extends State<LoginPage> {
           });
 
           if (userId != null) {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setString('username', username);
+
+            // ignore: use_build_context_synchronously
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => const HomePage(),
               ),
             );
           } else {
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text('Login Failed'),
-                content: const Text('Invalid username or password.'),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('OK'),
-                  ),
-                ],
-              ),
-            );
+            ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Login tidak berhasil.')));
           }
         } else {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Login Failed'),
-              content: const Text('Invalid username or password.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
-          );
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Login tidak berhasil.')));
         }
       }).catchError((error) {
-        print('Error during login: $error');
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Error'),
-            content: Text('An error occurred during login: $error'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Error: $error')));
       });
     }
   }

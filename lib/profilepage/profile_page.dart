@@ -1,7 +1,9 @@
 import 'package:cookmania/home_page.dart';
 import 'package:cookmania/profilepage/login_page.dart';
 import 'package:cookmania/profilepage/register_page.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -11,11 +13,58 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  final DatabaseReference _dbRef =
+      FirebaseDatabase.instance.ref().child('profile');
+  late Future<Map<String, String>> _dataFuture;
+
+  String? _username;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUsername();
+    _dataFuture = _getData();
+  }
+
+  Future<void> _loadUsername() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _username = prefs.getString('username');
+      _dataFuture = _getData();
+    });
+  }
+
+  Future<Map<String, String>> _getData() async {
+    if (_username != null) {
+      DataSnapshot snapshot = await _dbRef
+          .orderByChild('username')
+          .equalTo(_username)
+          .once()
+          .then((event) => event.snapshot);
+
+      if (snapshot.value != null) {
+        Map<dynamic, dynamic> data = snapshot.value as Map;
+        Map<String, String> userData = {};
+        data.forEach((key, value) {
+          userData['nama'] = value['nama'];
+          userData['username'] = value['username'];
+        });
+        return userData;
+      }
+    }
+    return {};
+  }
+
+  Future<void> _logout() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('username');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.only(top: 50.0, left: 16.0, right: 16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             // ----------------------------------TITLE----------------------------------
@@ -25,12 +74,24 @@ class _ProfilePageState extends State<ProfilePage> {
                 style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
               ),
             ),
-            const SizedBox(height: 20.0), _loggedOut(),
+            const SizedBox(height: 20.0),
+            FutureBuilder<Map<String, String>>(
+              future: _dataFuture,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return _loggedOut();
+                } else {
+                  return _loggedIn(snapshot.data!);
+                }
+              },
+            ),
           ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: const [
+        items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
               label: "Home", icon: Icon(Icons.home_outlined)),
           BottomNavigationBarItem(
@@ -46,34 +107,19 @@ class _ProfilePageState extends State<ProfilePage> {
         onTap: (int index) {
           switch (index) {
             case 0:
-              break;
-            case 1:
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => const HomePage(),
                 ),
               );
               break;
+            case 1:
+              break;
             case 2:
-              // Navigator.of(context).push(
-              //   MaterialPageRoute(
-              //     builder: (context) => BookmarkPage(),
-              //   ),
-              // );
               break;
             case 3:
-              // Navigator.of(context).push(
-              //   MaterialPageRoute(
-              //     builder: (context) => TopFoodPage(),
-              //   ),
-              // );
               break;
             case 4:
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const ProfilePage(),
-                ),
-              );
               break;
           }
         },
@@ -124,17 +170,17 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _loggedIn() {
+  Widget _loggedIn(Map<String, String> userData) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Username",
-          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+        Text(
+          "${userData['nama']}",
+          style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
         ),
-        const Text(
-          "Email",
-          style: TextStyle(fontSize: 18.0),
+        Text(
+          "@${userData['username']}",
+          style: const TextStyle(fontSize: 18.0),
         ),
         const Divider(height: 20, thickness: 1),
         const SizedBox(height: 10.0),
@@ -179,7 +225,8 @@ class _ProfilePageState extends State<ProfilePage> {
         SizedBox(
           width: double.infinity,
           child: FilledButton(
-              onPressed: () {
+              onPressed: () async {
+                _logout();
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => const LoginPage()));
               },

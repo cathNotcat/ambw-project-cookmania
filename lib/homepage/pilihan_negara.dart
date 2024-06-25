@@ -72,6 +72,9 @@ class _PilihanNegaraState extends State<PilihanNegara> {
               child: Column(
                 children: [
                   const TabBar(
+                    indicatorColor: Color.fromARGB(255, 245, 155, 11),
+                    labelStyle:
+                        TextStyle(color: Color.fromARGB(255, 245, 155, 11)),
                     tabs: [
                       Tab(text: 'Indonesian'),
                       Tab(text: 'Chinese'),
