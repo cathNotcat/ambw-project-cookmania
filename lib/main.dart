@@ -25,12 +25,12 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      // home: HomePage(),
+      home: HomePage(),
       // home: ProfilePage(),
       // home: LoginPage(),
       // home: ArchivePage(),
       // home: UploadRecipe(),
-      home: RecipePage(user:"user1",recipeKey: '1'),
+      // home: RecipePage(user:"user1",recipeKey: '1'),
       // home: EditRecipe(recipeKey: '17'),
     );
   }
