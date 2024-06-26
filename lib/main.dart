@@ -1,8 +1,10 @@
 import 'package:cookmania/archive_page.dart';
+import 'package:cookmania/edit_resep.dart';
 import 'package:cookmania/home_page.dart';
 import 'package:cookmania/profilepage/login_page.dart';
 import 'package:cookmania/profilepage/profile_page.dart';
 import 'package:cookmania/profilepage/register_page.dart';
+import 'package:cookmania/upload_recipe_fix.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'firebase_options.dart';
@@ -25,8 +27,9 @@ class MainApp extends StatelessWidget {
       // home: HomePage(),
       // home: ProfilePage(),
       // home: LoginPage(),
-      home: ArchivePage(),
-      // home: RecipePage(),
+      // home: ArchivePage(),
+      // home: UploadRecipe(),
+      home: EditRecipe(recipeKey: '17'),
     );
   }
 }

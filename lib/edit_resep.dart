@@ -1,15 +1,19 @@
+import 'dart:js_interop';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:intl/intl.dart';
 
-class UploadRecipe extends StatefulWidget {
-  const UploadRecipe({Key? key}) : super(key: key);
+class EditRecipe extends StatefulWidget {
+  final String recipeKey;
+
+  const EditRecipe({Key? key, required this.recipeKey}) : super(key: key);
 
   @override
-  _UploadRecipeState createState() => _UploadRecipeState();
+  _EditRecipeState createState() => _EditRecipeState();
 }
 
-class _UploadRecipeState extends State<UploadRecipe> {
+class _EditRecipeState extends State<EditRecipe> {
   final DatabaseReference _recipeRef =
       FirebaseDatabase.instance.ref().child('resep');
 
@@ -28,122 +32,113 @@ class _UploadRecipeState extends State<UploadRecipe> {
   List<Map<String, dynamic>> _ingredients = [];
   List<String> _steps = [];
 
-  final DatabaseReference _allresepRef =
-      FirebaseDatabase.instance.ref().child('resep');
-
-  var recipeCount = 0;
-  var key;
-
   @override
   void initState() {
     super.initState();
-    _getRecipeCount();
+    _loadRecipe();
   }
 
-  Future<void> _getRecipeCount() async {
+  Future<void> _loadRecipe() async {
     try {
-      // Use once() to fetch a single snapshot
-      DataSnapshot snapshot = await _allresepRef.get();
+      DataSnapshot snapshot = await _recipeRef.child(widget.recipeKey).get();
+      if (snapshot.exists) {
+        Map<String, dynamic> recipe =
+            Map<String, dynamic>.from(snapshot.value as Map);
+        setState(() {
+          _titleController.text = recipe['judul'];
+          _descriptionController.text = recipe['deskripsi'];
+          _countryController.text = recipe['negara'];
+          _costController.text = recipe['biaya'].toString();
+          _porsiController.text = recipe['porsi'].toString();
+          _durationController.text = recipe['durasi'].toString();
+          _kaloriController.text = recipe['kalori'].toString();
 
-      int count = snapshot.value != null ? (snapshot.value as Map).length : 0;
-      key = (count + 1).toString();
-      // if (dataSnapshot.value != null && dataSnapshot.value is Map) {
-      //   setState(() {
-      //     // Assuming 'resep' node contains map structure
-      //     recipeCount = dataSnapshot.value.hashCode;
-      //   });
-      // }
-      print("key" + key);
+          // Memuat bahan
+          DataSnapshot bahanSnapshot = snapshot.child('bahan');
+          for (var entry in bahanSnapshot.children) {
+            String nama = entry.child('nama').value as String? ?? '';
+            String takaran = entry.child('takaran').value as String? ?? '';
+            _ingredients.add({'nama': nama, 'takaran': takaran});
+          }
+
+          // Memuat langkah
+          DataSnapshot langkahSnapshot = snapshot.child('langkah');
+          for (var entry in langkahSnapshot.children) {
+            String value = entry.value as String? ?? '';
+            _steps.add(value);
+          }
+          // _ingredients = List<Map<String, dynamic>>.from(recipe['bahan']);
+          // print(_ingredients);
+          // _steps = List<String>.from(recipe['langkah']);
+          // print(_steps);
+        });
+      }
     } catch (e) {
-      print('Error fetching recipe count: $e');
+      print('Error loading recipe: $e');
     }
   }
 
-  Future<void> _saveRecipe() async {
-    // Validate input
-    if (_titleController.text.isEmpty ||
-        _descriptionController.text.isEmpty ||
-        _countryController.text.isEmpty ||
-        _costController.text.isEmpty ||
-        _ingredients.isEmpty ||
-        _steps.isEmpty ||
-        _porsiController.text.isEmpty ||
-        _durationController.text.isEmpty ||
-        _kaloriController.text.isEmpty) {
+  Future<void> _updateRecipe() async {
+    Map<String, dynamic> updatedFields = {};
+
+    if (_titleController.text.isNotEmpty) {
+      updatedFields['judul'] = _titleController.text;
+    }
+    if (_descriptionController.text.isNotEmpty) {
+      updatedFields['deskripsi'] = _descriptionController.text;
+    }
+    if (_countryController.text.isNotEmpty) {
+      updatedFields['negara'] = _countryController.text;
+    }
+    if (_costController.text.isNotEmpty) {
+      updatedFields['biaya'] = int.tryParse(_costController.text) ?? 0;
+    }
+    if (_porsiController.text.isNotEmpty) {
+      updatedFields['porsi'] = int.tryParse(_porsiController.text) ?? 0;
+    }
+    if (_durationController.text.isNotEmpty) {
+      updatedFields['durasi'] = int.tryParse(_durationController.text) ?? 0;
+    }
+    if (_kaloriController.text.isNotEmpty) {
+      updatedFields['kalori'] = int.tryParse(_kaloriController.text) ?? 0;
+    }
+    if (_ingredients.isNotEmpty) {
+      Map<String, dynamic> ingredientsMap = {};
+      for (int i = 0; i < _ingredients.length; i++) {
+        ingredientsMap[(i + 1).toString()] = _ingredients[i];
+      }
+      updatedFields['bahan'] = ingredientsMap;
+    }
+    if (_steps.isNotEmpty) {
+      Map<String, dynamic> stepsMap = {};
+      for (int i = 0; i < _steps.length; i++) {
+        stepsMap[(i+1).toString()] = _steps[i];
+      }
+      updatedFields['langkah'] = stepsMap;
+    }
+
+    if (updatedFields.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Semua kolom harus diisi')),
+        SnackBar(content: Text('Tidak ada perubahan untuk diperbarui')),
       );
       return;
     }
 
-    // Convert numerical values
-    int cost = int.tryParse(_costController.text) ?? 0;
-    int porsi = int.tryParse(_porsiController.text) ?? 0;
-    int duration = int.tryParse(_durationController.text) ?? 0;
-    int kalori = int.tryParse(_kaloriController.text) ?? 0;
+    // Map<String, dynamic> stepsMap = {};
+    // for (int i = 1; i < _steps.length; i++) {
+    //   stepsMap[i.toString()] = _steps[i];
+    // }
 
-    // Get the number of existing recipes
-
-    // DataSnapshot snapshot = await _recipeRef.get();
-    // int count = snapshot.value != null ? (snapshot.value as Map).length : 0;
-    // String key = (count + 1).toString();
-    // Simpan resep ke Firebase Database
-    // Convert list of maps to a map with unique keys
-
-    Map<String, dynamic> ingredientsMap = {};
-    for (int i = 1; i < _ingredients.length; i++) {
-      ingredientsMap[i.toString()] = _ingredients[i];
-    }
-
-    // Convert list of steps to a map with unique keys
-    Map<String, dynamic> stepsMap = {};
-    for (int i = 1; i < _steps.length; i++) {
-      stepsMap[i.toString()] = _steps[i];
-    }
-
-    print("masuk sini");
     String formattedDate = DateFormat('dd MMMM yyyy').format(DateTime.now());
+    updatedFields['tanggal'] = formattedDate;
 
-    print(formattedDate);
-
-    _recipeRef.child(key).set({
-      'judul': _titleController.text,
-      'deskripsi': _descriptionController.text,
-      'negara': _countryController.text,
-      'biaya': cost,
-      'bahan': _ingredients,
-      'langkah': _steps,
-      'porsi': porsi,
-      'durasi': duration,
-      'kalori': kalori,
-      'id_creator': 'user1',
-      'komentar': {},
-      'foto': "default.png",
-      'tanggal': formattedDate,
-    }).then((_) {
-      // Berhasil menyimpan
+    _recipeRef.child(widget.recipeKey).update(updatedFields).then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Resep berhasil diunggah')),
+        SnackBar(content: Text('Resep berhasil diperbarui')),
       );
-      // Reset input setelah disimpan
-      _titleController.clear();
-      _descriptionController.clear();
-      _countryController.clear();
-      _costController.clear();
-      _ingredientController.clear();
-      _stepController.clear();
-      _porsiController.clear();
-      _durationController.clear();
-      _kaloriController.clear();
-
-      setState(() {
-        _ingredients.clear();
-        _steps.clear();
-      });
     }).catchError((error) {
-      // Gagal menyimpan
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal mengunggah resep: $error')),
+        SnackBar(content: Text('Gagal memperbarui resep: $error')),
       );
     });
   }
@@ -152,12 +147,12 @@ class _UploadRecipeState extends State<UploadRecipe> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Upload Recipe'),
+        title: Text('Edit Recipe'),
         actions: [
           ElevatedButton(
-            onPressed: _saveRecipe,
+            onPressed: _updateRecipe,
             child: Text(
-              "Simpan",
+              "Update",
               style: TextStyle(
                 fontSize: 16.0,
                 fontWeight: FontWeight.bold,
@@ -171,7 +166,6 @@ class _UploadRecipeState extends State<UploadRecipe> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title Input
             TextField(
               controller: _titleController,
               decoration: InputDecoration(
@@ -182,8 +176,6 @@ class _UploadRecipeState extends State<UploadRecipe> {
               ),
             ),
             SizedBox(height: 16.0),
-
-            // Description Input
             TextField(
               controller: _descriptionController,
               maxLines: 3,
@@ -195,8 +187,6 @@ class _UploadRecipeState extends State<UploadRecipe> {
               ),
             ),
             SizedBox(height: 16.0),
-
-            // Country Input
             TextField(
               controller: _countryController,
               decoration: InputDecoration(
@@ -207,8 +197,6 @@ class _UploadRecipeState extends State<UploadRecipe> {
               ),
             ),
             SizedBox(height: 16.0),
-
-            // Cost Input
             TextField(
               controller: _costController,
               keyboardType: TextInputType.number,
@@ -220,19 +208,17 @@ class _UploadRecipeState extends State<UploadRecipe> {
               ),
             ),
             SizedBox(height: 16.0),
-
             TextField(
               controller: _porsiController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                hintText: 'porsi',
+                hintText: 'Porsi',
                 hintStyle:
                     TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                 border: OutlineInputBorder(),
               ),
             ),
             SizedBox(height: 16.0),
-
             TextField(
               controller: _durationController,
               keyboardType: TextInputType.number,
@@ -244,7 +230,6 @@ class _UploadRecipeState extends State<UploadRecipe> {
               ),
             ),
             SizedBox(height: 16.0),
-
             TextField(
               controller: _kaloriController,
               keyboardType: TextInputType.number,
@@ -255,10 +240,7 @@ class _UploadRecipeState extends State<UploadRecipe> {
                 border: OutlineInputBorder(),
               ),
             ),
-
             SizedBox(height: 16.0),
-
-            // Ingredients Input
             Row(
               children: [
                 Expanded(
@@ -313,9 +295,6 @@ class _UploadRecipeState extends State<UploadRecipe> {
                 ),
               ),
             SizedBox(height: 16.0),
-
-            // Steps Input
-            // Steps Input
             TextField(
               controller: _stepController,
               decoration: InputDecoration(
