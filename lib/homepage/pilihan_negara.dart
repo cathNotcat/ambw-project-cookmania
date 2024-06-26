@@ -101,10 +101,29 @@ class _PilihanNegaraState extends State<PilihanNegara> {
   }
 }
 
-class PageViewWidget extends StatelessWidget {
+class PageViewWidget extends StatefulWidget {
   final List<Map<String, String>> images;
 
   const PageViewWidget({required this.images, super.key});
+
+  @override
+  State<PageViewWidget> createState() => _PageViewWidgetState();
+}
+
+class _PageViewWidgetState extends State<PageViewWidget> {
+  List<bool> _isArchived = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _isArchived = List<bool>.filled(widget.images.length, false);
+  }
+
+  void _toggleBookmark(int index) {
+    setState(() {
+      _isArchived[index] = !_isArchived[index];
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +134,9 @@ class PageViewWidget extends StatelessWidget {
         Expanded(
           child: PageView(
             controller: controller,
-            children: images.map((image) {
+            children: widget.images.asMap().entries.map((entry) {
+              int index = entry.key;
+              Map<String, String> image = entry.value;
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Stack(
@@ -136,13 +157,27 @@ class PageViewWidget extends StatelessWidget {
                         color: Colors.black.withOpacity(0.5),
                         padding: const EdgeInsets.symmetric(
                             vertical: 5.0, horizontal: 10.0),
-                        child: Text(
-                          image['name']!,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              image['name']!,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () => _toggleBookmark(index),
+                              child: Icon(
+                                _isArchived[index]
+                                    ? Icons.bookmark
+                                    : Icons.bookmark_outline,
+                                color: const Color.fromARGB(255, 248, 175, 18),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -155,7 +190,7 @@ class PageViewWidget extends StatelessWidget {
         const SizedBox(height: 10.0),
         SmoothPageIndicator(
           controller: controller,
-          count: images.length,
+          count: widget.images.length,
           effect: JumpingDotEffect(
             activeDotColor: Colors.yellow.shade800,
             dotColor: const Color.fromARGB(255, 252, 226, 185),
@@ -170,3 +205,146 @@ class PageViewWidget extends StatelessWidget {
     );
   }
 }
+
+
+// ini untuk firebase. tapi masih error:
+
+// class PageViewWidget extends StatefulWidget {
+//   final List<Map<String, String>> images;
+
+//   const PageViewWidget({required this.images, super.key});
+
+//   @override
+//   State<PageViewWidget> createState() => _PageViewWidgetState();
+// }
+
+// class _PageViewWidgetState extends State<PageViewWidget> {
+//   final PageController controller = PageController();
+//   final DatabaseReference _dbRef =
+//       FirebaseDatabase.instance.ref().child('profile');
+//   String? _username;
+//   List<bool> _isArchived = [];
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _loadUsername();
+//     _isArchived = List<bool>.filled(widget.images.length, false);
+//   }
+
+//   Future<void> _loadUsername() async {
+//     SharedPreferences prefs = await SharedPreferences.getInstance();
+//     setState(() {
+//       _username = prefs.getString('username');
+//     });
+//   }
+
+//   Future<void> _toggleBookmark(int index, String resepId) async {
+//     setState(() {
+//       _isArchived[index] = !_isArchived[index];
+//     });
+
+//     if (_username != null) {
+//       final userSnapshot = await _dbRef
+//           .orderByChild('username')
+//           .equalTo(_username!)
+//           .once()
+//           .then((event) => event.snapshot);
+
+//       if (userSnapshot.exists) {
+//         final userNode = userSnapshot.children.first;
+//         final archiveRef = userNode.ref.child('archive');
+
+//         if (_isArchived[index]) {
+//           await archiveRef.push().set(resepId);
+//         } else {
+//           final archiveSnapshot =
+//               await archiveRef.orderByValue().equalTo(resepId).once();
+//           if (archiveSnapshot.snapshot.exists) {
+//             archiveSnapshot.snapshot.children.first.ref.remove();
+//           }
+//         }
+//       }
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final PageController controller = PageController();
+
+//     return Column(
+//       children: [
+//         Expanded(
+//           child: PageView(
+//             controller: controller,
+//             children: widget.images.asMap().entries.map((entry) {
+//               int index = entry.key;
+//               Map<String, String> image = entry.value;
+//               return Padding(
+//                 padding: const EdgeInsets.all(8.0),
+//                 child: Stack(
+//                   children: [
+//                     ClipRRect(
+//                       borderRadius: BorderRadius.circular(10.0),
+//                       child: Image.asset(
+//                         image['path']!,
+//                         width: MediaQuery.of(context).size.width,
+//                         fit: BoxFit.cover,
+//                       ),
+//                     ),
+//                     Positioned(
+//                       bottom: 0.0,
+//                       left: 0.0,
+//                       right: 0.0,
+//                       child: Container(
+//                         color: Colors.black.withOpacity(0.5),
+//                         padding: const EdgeInsets.symmetric(
+//                             vertical: 5.0, horizontal: 10.0),
+//                         child: Row(
+//                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                           children: [
+//                             Text(
+//                               image['name']!,
+//                               style: const TextStyle(
+//                                 color: Colors.white,
+//                                 fontSize: 16.0,
+//                                 fontWeight: FontWeight.bold,
+//                               ),
+//                             ),
+//                             GestureDetector(
+//                               onTap: () => _toggleBookmark(index, image['id']!),
+//                               child: Icon(
+//                                 _isArchived[index]
+//                                     ? Icons.bookmark
+//                                     : Icons.bookmark_outline,
+//                                 color: const Color.fromARGB(255, 248, 175, 18),
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               );
+//             }).toList(),
+//           ),
+//         ),
+//         const SizedBox(height: 10.0),
+//         SmoothPageIndicator(
+//           controller: controller,
+//           count: widget.images.length,
+//           effect: JumpingDotEffect(
+//             activeDotColor: Colors.yellow.shade800,
+//             dotColor: const Color.fromARGB(255, 252, 226, 185),
+//             dotHeight: 10,
+//             dotWidth: 10,
+//             spacing: 16,
+//             verticalOffset: 10,
+//             jumpScale: 1.5,
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
