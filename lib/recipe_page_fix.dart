@@ -1,10 +1,10 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/widgets.dart';
+// import 'package:firebase_core/firebase_core.dart';
+// import 'package:flutter/widgets.dart';
 
 class RecipePage extends StatefulWidget {
-  const RecipePage({Key? key}) : super(key: key);
+  const RecipePage({super.key});
 
   @override
   State<RecipePage> createState() => _RecipePageState();
@@ -27,17 +27,19 @@ class _RecipePageState extends State<RecipePage> {
   var negara = "";
   var porsi = ""; // Belum digunakan
   var foto = "";
+  // ignore: non_constant_identifier_names
   var id_creator = ""; // Belum digunakan
   var tanggal = ""; // Belum digunakan
 
   var username = "";
   var nama = "";
   var kota = "";
+  // ignore: non_constant_identifier_names
   var foto_prof = "";
 
-  TextEditingController _commentController = TextEditingController();
+  final TextEditingController _commentController = TextEditingController();
 
-  late Future<void> _data;
+  // late Future<void> _data;
 
   @override
   void initState() {
@@ -94,17 +96,17 @@ class _RecipePageState extends State<RecipePage> {
           // Memuat langkah
           DataSnapshot langkahSnapshot = snapshot.child('langkah');
           langkah = {};
-          langkahSnapshot.children.forEach((entry) {
+          for (var entry in langkahSnapshot.children) {
             langkah[entry.key ?? ''] = entry.value as String? ?? '';
-          });
+          }
 
           DataSnapshot komentarSnapshot = snapshot.child('komentar');
           komentar = {};
-          komentarSnapshot.children.forEach((entry) {
+          for (var entry in komentarSnapshot.children) {
             String nama = entry.child('nama').value as String? ?? '';
             String komen = entry.child('komen').value as String? ?? '';
             komentar[entry.key ?? ''] = {'nama': nama, 'komen': komen};
-          });
+          }
 
           print(langkah);
         });
@@ -133,6 +135,7 @@ class _RecipePageState extends State<RecipePage> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
@@ -164,7 +167,7 @@ class _RecipePageState extends State<RecipePage> {
             children: [
               // ----------------------------------IMAGE----------------------------------
               Image.asset(
-                'lib/images/' + foto,
+                'lib/images/$foto',
                 height: 300,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -203,7 +206,7 @@ class _RecipePageState extends State<RecipePage> {
                                 // fit: BoxFit.cover,
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                                 width: 10), // Jarak antara ClipOval dan Column
 
                             Column(
@@ -228,7 +231,7 @@ class _RecipePageState extends State<RecipePage> {
                                 Row(
                                   // crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.location_on_outlined,
                                       color: Colors.black,
                                       size: 18,
@@ -260,7 +263,7 @@ class _RecipePageState extends State<RecipePage> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
                       deskripsi,
                       style: const TextStyle(
@@ -278,8 +281,8 @@ class _RecipePageState extends State<RecipePage> {
                         // fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 10),
-                    Divider(
+                    const SizedBox(height: 10),
+                    const Divider(
                       color: Colors.grey,
                       thickness: 1, // Ketebalan garis
                       height: 20, // Tinggi garis
