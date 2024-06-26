@@ -4,15 +4,19 @@ import 'package:flutter/material.dart';
 // import 'package:flutter/widgets.dart';
 
 class RecipePage extends StatefulWidget {
-  const RecipePage({super.key});
+  final String user;
+  final String recipeKey;
+
+  const RecipePage({super.key, required this.user, required this.recipeKey});
 
   @override
   State<RecipePage> createState() => _RecipePageState();
 }
 
 class _RecipePageState extends State<RecipePage> {
-  final DatabaseReference _resepRef =
-      FirebaseDatabase.instance.ref().child('resep').child('1');
+  
+  DatabaseReference _resepRef =
+      FirebaseDatabase.instance.ref().child('resep');
   final DatabaseReference _profileRef =
       FirebaseDatabase.instance.ref().child('profile');
 
@@ -44,6 +48,7 @@ class _RecipePageState extends State<RecipePage> {
   @override
   void initState() {
     super.initState();
+    _resepRef = _resepRef.child(widget.recipeKey);
     _loadDataResep();
   }
 

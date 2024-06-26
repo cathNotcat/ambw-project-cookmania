@@ -7,9 +7,10 @@ import 'package:intl/intl.dart';
 class EditRecipe extends StatefulWidget {
   final String recipeKey;
 
-  const EditRecipe({Key? key, required this.recipeKey}) : super(key: key);
+  const EditRecipe({super.key, required this.recipeKey});
 
   @override
+  // ignore: library_private_types_in_public_api
   _EditRecipeState createState() => _EditRecipeState();
 }
 
