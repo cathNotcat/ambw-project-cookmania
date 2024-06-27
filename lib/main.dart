@@ -30,7 +30,7 @@ class MainApp extends StatelessWidget {
       // home: LoginPage(),
       // home: ArchivePage(),
       // home: UploadRecipe(),
-      // home: RecipePage(user:"user1",recipeKey: '1'),
+      // home: RecipePage(user: "user1", recipeKey: '1'),
       // home: EditRecipe(recipeKey: '17'),
     );
   }

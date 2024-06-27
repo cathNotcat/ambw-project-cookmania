@@ -1,5 +1,7 @@
+import 'package:cookmania/profilepage/login_page.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:firebase_core/firebase_core.dart';
 // import 'package:flutter/widgets.dart';
 
@@ -39,7 +41,10 @@ class _RecipePageState extends State<RecipePage> {
   // ignore: non_constant_identifier_names
   var foto_prof = "";
   var count_komentar = 0;
-  var isBookmarked;
+  bool isBookmarked = false;
+
+  String? _username;
+  bool isLoggedIn = false;
 
   final TextEditingController _commentController = TextEditingController();
 
@@ -50,6 +55,16 @@ class _RecipePageState extends State<RecipePage> {
     super.initState();
     _resepRef = _resepRef.child(widget.recipeKey);
     _loadDataResep();
+    _loadUsername();
+  }
+
+  Future<void> _loadUsername() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _username = prefs.getString('username');
+      isLoggedIn = true;
+      print('username: $_username');
+    });
   }
 
   Future<void> _saveComment() async {
@@ -75,17 +90,98 @@ class _RecipePageState extends State<RecipePage> {
     }
   }
 
-  Future<void> _archiveRecipe() async {
-    try {
-      print(widget.recipeKey);
+  Future<void> archiveRecipe(String userKey, String recipeKey) async {
+    if (isLoggedIn != null) {
+      try {
+        String newRecipeKey = 'resep$recipeKey';
+        print(userKey);
+        print(newRecipeKey);
 
-      await _profileRef.child(widget.user).child('archive').push().set({
-        'id_resep': widget.recipeKey,
+        // Cek apakah kunci sudah ada
+        DatabaseEvent snapshot = await _profileRef
+            .child(userKey)
+            .child('archive')
+            .child(newRecipeKey)
+            .once();
+
+        if (snapshot.snapshot.value != null) {
+          await _profileRef
+              .child(userKey)
+              .child('archive')
+              .child(newRecipeKey)
+              .remove();
+          setState(() {
+            isBookmarked = false;
+          });
+          print('Resep dengan kunci $newRecipeKey sudah ada dalam arsip.');
+          // _removeRecipeFromArchive(userKey, newRecipeKey);
+        } else if (snapshot.snapshot.value == null) {
+          // Jika kunci belum ada, tambahkan ke database
+          await _profileRef
+              .child(userKey)
+              .child('archive')
+              .child(newRecipeKey)
+              .set(recipeKey);
+
+          print('Resep berhasil diarsipkan: $newRecipeKey');
+
+          // Tambahkan setState jika diperlukan untuk merender tampilan kembali
+          setState(() {
+            isBookmarked = true;
+          });
+        }
+      } catch (e) {
+        print('Error archiving recipe: $e');
+
+        // Jika pengguna belum login, tampilkan modal untuk login
+        await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Silakan login dahulu"),
+              actions: [
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const LoginPage()));
+                      },
+                      style: FilledButton.styleFrom(
+                          backgroundColor: Colors.yellow[800],
+                          foregroundColor: Colors.black),
+                      child: const Text(
+                        "Login",
+                      )),
+                ),
+              ],
+            );
+          },
+        );
+        return; // Keluar dari fungsi jika belum login
+      }
+    }
+  }
+
+  Future<void> _removeRecipeFromArchive(
+      String userKey, String archiveKey) async {
+    try {
+      DatabaseReference profileRef = FirebaseDatabase.instance
+          .ref()
+          .child('profile')
+          .child(userKey)
+          .child('archive');
+
+      // Menghapus entri arsip berdasarkan archiveKey
+      await profileRef.child(archiveKey).remove();
+      setState(() {
+        isBookmarked = true;
       });
 
-      isBookmarked = true;
+      print(
+          'Resep berhasil dihapus dari arsip pengguna dengan kunci $archiveKey');
     } catch (e) {
-      print('Error archiving recipe: $e');
+      print('Error removing recipe from archive: $e');
     }
   }
 
@@ -190,17 +286,13 @@ class _RecipePageState extends State<RecipePage> {
           actions: [
             IconButton(
               icon: Icon(
-                isBookmarked
-                    ? Icons.bookmark_rounded // Icon berwarna jika di-bookmark
-                    : Icons
-                        .bookmark_border_rounded, // Icon tidak berwarna jika tidak di-bookmark
-                color: isBookmarked
-                    ? Colors.orange
-                    : Colors
-                        .orange, // Warna icon berdasarkan status isBookmarked),
+                isBookmarked ? Icons.bookmark : Icons.bookmark_outline,
+                color: Colors.orange,
               ),
               onPressed: () {
-                _archiveRecipe();
+                print(isBookmarked);
+                archiveRecipe(widget.user, widget.recipeKey);
+                // _archiveRecipe(widget.user, widget.recipeKey);
               },
             ),
           ],

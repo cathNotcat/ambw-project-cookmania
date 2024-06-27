@@ -50,11 +50,6 @@ class _ArchivePageState extends State<ArchivePage> {
 
       dynamic archiveValue = archiveSnapshot.value;
 
-      // archive dari id tersebut dibuka terus dimasukin list
-      // if (archiveValue is List) {
-      //   for (var value in archiveValue) {
-
-      // archive dalam map
       if (archiveValue is Map) {
         for (var value in archiveValue.values) {
           DataSnapshot childSnapshot =

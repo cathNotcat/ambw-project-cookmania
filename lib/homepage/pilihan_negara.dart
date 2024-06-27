@@ -1,9 +1,11 @@
+import 'package:cookmania/recipe_page_fix.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PilihanNegara extends StatefulWidget {
-  const PilihanNegara({super.key});
+  const PilihanNegara({Key? key}) : super(key: key);
 
   @override
   State<PilihanNegara> createState() => _PilihanNegaraState();
@@ -12,13 +14,22 @@ class PilihanNegara extends StatefulWidget {
 class _PilihanNegaraState extends State<PilihanNegara> {
   final DatabaseReference _dbRef =
       FirebaseDatabase.instance.ref().child('resep');
-
   late Future<Map<String, List<Map<String, String>>>> _dataFuture;
+  late String _username; // to store the username from SharedPreferences
 
   @override
   void initState() {
     super.initState();
     _dataFuture = _getData();
+    _loadUsername(); // Load username from SharedPreferences
+  }
+
+  Future<void> _loadUsername() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _username =
+          prefs.getString('username') ?? ''; // Replace 'username' with your key
+    });
   }
 
   Future<Map<String, List<Map<String, String>>>> _getData() async {
@@ -33,12 +44,12 @@ class _PilihanNegaraState extends State<PilihanNegara> {
       String? negara = entry.child('negara').value as String?;
       String? judul = entry.child('judul').value as String?;
       String? foto = entry.child('foto').value as String?;
-      // print('Judul: $judul, Foto: $foto, Negara: $negara');
 
       if (negara != null && judul != null && foto != null) {
         Map<String, String> item = {
           'path': 'lib/images/$foto',
           'name': judul,
+          'recipeKey': entry.key!, // Store the recipe key here
         };
 
         if (negara.toLowerCase() == 'indonesian') {
@@ -85,9 +96,12 @@ class _PilihanNegaraState extends State<PilihanNegara> {
                   Expanded(
                     child: TabBarView(
                       children: [
-                        PageViewWidget(images: data['Indonesian']!),
-                        PageViewWidget(images: data['Chinese']!),
-                        PageViewWidget(images: data['Japanese']!),
+                        PageViewWidget(
+                            images: data['Indonesian']!, username: _username),
+                        PageViewWidget(
+                            images: data['Chinese']!, username: _username),
+                        PageViewWidget(
+                            images: data['Japanese']!, username: _username),
                       ],
                     ),
                   ),
@@ -103,8 +117,10 @@ class _PilihanNegaraState extends State<PilihanNegara> {
 
 class PageViewWidget extends StatefulWidget {
   final List<Map<String, String>> images;
+  final String username;
 
-  const PageViewWidget({required this.images, super.key});
+  const PageViewWidget({required this.images, required this.username, Key? key})
+      : super(key: key);
 
   @override
   State<PageViewWidget> createState() => _PageViewWidgetState();
@@ -125,6 +141,17 @@ class _PageViewWidgetState extends State<PageViewWidget> {
     });
   }
 
+  void _navigateToRecipePage(int index) {
+    String recipeKey = widget.images[index]['recipeKey']!;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            RecipePage(user: widget.username, recipeKey: recipeKey),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final PageController controller = PageController();
@@ -137,51 +164,45 @@ class _PageViewWidgetState extends State<PageViewWidget> {
             children: widget.images.asMap().entries.map((entry) {
               int index = entry.key;
               Map<String, String> image = entry.value;
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10.0),
-                      child: Image.asset(
-                        image['path']!,
-                        width: MediaQuery.of(context).size.width,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0.0,
-                      left: 0.0,
-                      right: 0.0,
-                      child: Container(
-                        color: Colors.black.withOpacity(0.5),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 5.0, horizontal: 10.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              image['name']!,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => _toggleBookmark(index),
-                              child: Icon(
-                                _isArchived[index]
-                                    ? Icons.bookmark
-                                    : Icons.bookmark_outline,
-                                color: const Color.fromARGB(255, 248, 175, 18),
-                              ),
-                            ),
-                          ],
+              return GestureDetector(
+                onTap: () => _navigateToRecipePage(index),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10.0),
+                        child: Image.asset(
+                          image['path']!,
+                          width: MediaQuery.of(context).size.width,
+                          fit: BoxFit.cover,
                         ),
                       ),
-                    ),
-                  ],
+                      Positioned(
+                        bottom: 0.0,
+                        left: 0.0,
+                        right: 0.0,
+                        child: Container(
+                          color: Colors.black.withOpacity(0.5),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 5.0, horizontal: 10.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                image['name']!,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             }).toList(),
@@ -206,8 +227,108 @@ class _PageViewWidgetState extends State<PageViewWidget> {
   }
 }
 
+// import 'package:flutter/material.dart';
+// import 'package:firebase_database/firebase_database.dart';
+// import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-// ini untuk firebase. tapi masih error:
+// class PilihanNegara extends StatefulWidget {
+//   const PilihanNegara({super.key});
+
+//   @override
+//   State<PilihanNegara> createState() => _PilihanNegaraState();
+// }
+
+// class _PilihanNegaraState extends State<PilihanNegara> {
+//   final DatabaseReference _dbRef =
+//       FirebaseDatabase.instance.ref().child('resep');
+
+//   late Future<Map<String, List<Map<String, String>>>> _dataFuture;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _dataFuture = _getData();
+//   }
+
+//   Future<Map<String, List<Map<String, String>>>> _getData() async {
+//     DataSnapshot snapshot = await _dbRef.get();
+//     Map<String, List<Map<String, String>>> data = {
+//       'Indonesian': [],
+//       'Chinese': [],
+//       'Japanese': [],
+//     };
+
+//     for (var entry in snapshot.children) {
+//       String? negara = entry.child('negara').value as String?;
+//       String? judul = entry.child('judul').value as String?;
+//       String? foto = entry.child('foto').value as String?;
+//       // print('Judul: $judul, Foto: $foto, Negara: $negara');
+
+//       if (negara != null && judul != null && foto != null) {
+//         Map<String, String> item = {
+//           'path': 'lib/images/$foto',
+//           'name': judul,
+//         };
+
+//         if (negara.toLowerCase() == 'indonesian') {
+//           data['Indonesian']!.add(item);
+//         } else if (negara.toLowerCase() == 'chinese') {
+//           data['Chinese']!.add(item);
+//         } else if (negara.toLowerCase() == 'japanese') {
+//           data['Japanese']!.add(item);
+//         }
+//       }
+//     }
+//     return data;
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return FutureBuilder<Map<String, List<Map<String, String>>>>(
+//       future: _dataFuture,
+//       builder: (context, snapshot) {
+//         if (snapshot.connectionState == ConnectionState.waiting) {
+//           return const Center(child: CircularProgressIndicator());
+//         } else if (snapshot.hasError) {
+//           return Center(child: Text('Error: ${snapshot.error}'));
+//         } else {
+//           Map<String, List<Map<String, String>>> data = snapshot.data!;
+
+//           return SizedBox(
+//             height: 300,
+//             child: DefaultTabController(
+//               length: 3,
+//               child: Column(
+//                 children: [
+//                   const TabBar(
+//                     indicatorColor: Color.fromARGB(255, 245, 155, 11),
+//                     labelStyle:
+//                         TextStyle(color: Color.fromARGB(255, 245, 155, 11)),
+//                     tabs: [
+//                       Tab(text: 'Indonesian'),
+//                       Tab(text: 'Chinese'),
+//                       Tab(text: 'Japanese'),
+//                     ],
+//                   ),
+//                   const SizedBox(height: 10),
+//                   Expanded(
+//                     child: TabBarView(
+//                       children: [
+//                         PageViewWidget(images: data['Indonesian']!),
+//                         PageViewWidget(images: data['Chinese']!),
+//                         PageViewWidget(images: data['Japanese']!),
+//                       ],
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           );
+//         }
+//       },
+//     );
+//   }
+// }
 
 // class PageViewWidget extends StatefulWidget {
 //   final List<Map<String, String>> images;
@@ -219,53 +340,18 @@ class _PageViewWidgetState extends State<PageViewWidget> {
 // }
 
 // class _PageViewWidgetState extends State<PageViewWidget> {
-//   final PageController controller = PageController();
-//   final DatabaseReference _dbRef =
-//       FirebaseDatabase.instance.ref().child('profile');
-//   String? _username;
 //   List<bool> _isArchived = [];
 
 //   @override
 //   void initState() {
 //     super.initState();
-//     _loadUsername();
 //     _isArchived = List<bool>.filled(widget.images.length, false);
 //   }
 
-//   Future<void> _loadUsername() async {
-//     SharedPreferences prefs = await SharedPreferences.getInstance();
-//     setState(() {
-//       _username = prefs.getString('username');
-//     });
-//   }
-
-//   Future<void> _toggleBookmark(int index, String resepId) async {
+//   void _toggleBookmark(int index) {
 //     setState(() {
 //       _isArchived[index] = !_isArchived[index];
 //     });
-
-//     if (_username != null) {
-//       final userSnapshot = await _dbRef
-//           .orderByChild('username')
-//           .equalTo(_username!)
-//           .once()
-//           .then((event) => event.snapshot);
-
-//       if (userSnapshot.exists) {
-//         final userNode = userSnapshot.children.first;
-//         final archiveRef = userNode.ref.child('archive');
-
-//         if (_isArchived[index]) {
-//           await archiveRef.push().set(resepId);
-//         } else {
-//           final archiveSnapshot =
-//               await archiveRef.orderByValue().equalTo(resepId).once();
-//           if (archiveSnapshot.snapshot.exists) {
-//             archiveSnapshot.snapshot.children.first.ref.remove();
-//           }
-//         }
-//       }
-//     }
 //   }
 
 //   @override
@@ -312,7 +398,7 @@ class _PageViewWidgetState extends State<PageViewWidget> {
 //                               ),
 //                             ),
 //                             GestureDetector(
-//                               onTap: () => _toggleBookmark(index, image['id']!),
+//                               onTap: () => _toggleBookmark(index),
 //                               child: Icon(
 //                                 _isArchived[index]
 //                                     ? Icons.bookmark
