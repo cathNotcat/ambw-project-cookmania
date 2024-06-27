@@ -39,6 +39,7 @@ class _RecipePageState extends State<RecipePage> {
   // ignore: non_constant_identifier_names
   var foto_prof = "";
   var count_komentar = 0;
+  var isBookmarked;
 
   final TextEditingController _commentController = TextEditingController();
 
@@ -55,7 +56,8 @@ class _RecipePageState extends State<RecipePage> {
     print("Save comment");
     DataSnapshot snapshot = await _resepRef.child('komentar').get();
 
-    count_komentar = snapshot.value != null ? (snapshot.value as Map).length : 0;
+    count_komentar =
+        snapshot.value != null ? (snapshot.value as Map).length : 0;
     print("count $count_komentar ");
 
     String comment = _commentController.text;
@@ -75,12 +77,13 @@ class _RecipePageState extends State<RecipePage> {
 
   Future<void> _archiveRecipe() async {
     try {
-      await _profileRef.child('archive').push().set({
+      print(widget.recipeKey);
+
+      await _profileRef.child(widget.user).child('archive').push().set({
         'id_resep': widget.recipeKey,
       });
-      
 
-
+      isBookmarked = true;
     } catch (e) {
       print('Error archiving recipe: $e');
     }
@@ -101,6 +104,7 @@ class _RecipePageState extends State<RecipePage> {
           foto = snapshot.child('foto').value as String? ?? "";
           id_creator = snapshot.child('id_creator').value as String? ?? "";
           tanggal = snapshot.child('tanggal').value as String? ?? "";
+
           _loadDataProfile(id_creator);
 
           // Memuat bahan
@@ -144,7 +148,24 @@ class _RecipePageState extends State<RecipePage> {
           username = snapshot.child('username').value as String? ?? "";
           kota = snapshot.child('kota').value as String? ?? "";
           foto_prof = snapshot.child('foto').value as String? ?? "";
-
+          DataSnapshot archivedSnapshot = snapshot.child('archive');
+          var id_resep;
+          print("length " + archivedSnapshot.children.length.toString());
+          print("length " + archivedSnapshot.children.length.toString());
+          for (var entry in archivedSnapshot.children) {
+            var id_resep = entry.child('id_resep').value as String?;
+            print("id_resep: $id_resep");
+            if (id_resep == widget.recipeKey) {
+              setState(() {
+                isBookmarked = true;
+              });
+              break; // Keluar dari loop jika sudah ditemukan id_resep yang sesuai
+            } else {
+              setState(() {
+                isBookmarked = false;
+              });
+            }
+          }
           print(nama);
           print(foto_prof);
         });
@@ -168,8 +189,19 @@ class _RecipePageState extends State<RecipePage> {
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.bookmark_border_rounded),
-              onPressed: () {},
+              icon: Icon(
+                isBookmarked
+                    ? Icons.bookmark_rounded // Icon berwarna jika di-bookmark
+                    : Icons
+                        .bookmark_border_rounded, // Icon tidak berwarna jika tidak di-bookmark
+                color: isBookmarked
+                    ? Colors.orange
+                    : Colors
+                        .orange, // Warna icon berdasarkan status isBookmarked),
+              ),
+              onPressed: () {
+                _archiveRecipe();
+              },
             ),
           ],
         ),
