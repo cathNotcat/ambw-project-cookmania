@@ -6,9 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:flutter/widgets.dart';
 
 class RecipePage extends StatefulWidget {
+  // final String user;
   final String recipeKey;
 
-  const RecipePage({super.key, required this.recipeKey});
+  const RecipePage({super.key,  required this.recipeKey});
 
   @override
   State<RecipePage> createState() => _RecipePageState();
@@ -57,6 +58,7 @@ class _RecipePageState extends State<RecipePage> {
     _loadUsername();
   }
 
+
   Future<void> _loadUsername() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -64,21 +66,30 @@ class _RecipePageState extends State<RecipePage> {
       isLoggedIn = _username != null;
       print('username: $_username');
     });
+
+    
   }
 
   Future<void> _saveComment() async {
+     if (!isLoggedIn) {
+      await _showLoginDialog();
+      return;
+    }
     print("Save comment");
-    DataSnapshot snapshot = await _resepRef.child('komentar').get();
 
-    count_komentar =
-        snapshot.value != null ? (snapshot.value as Map).length : 0;
-    print("count $count_komentar ");
+    var userlogin = "";
+    DataSnapshot snapshot = await _profileRef.child(_username!).get();
+      if (snapshot.exists) {
+        setState(() {
+          userlogin = snapshot.child('nama').value as String? ?? "";
+        });
+      }
 
     String comment = _commentController.text;
     if (comment.isNotEmpty) {
       try {
         await _resepRef.child('komentar').push().set({
-          'nama': nama,
+          'nama': userlogin,
           'komen': comment,
         });
         _commentController.clear();
@@ -260,7 +271,7 @@ class _RecipePageState extends State<RecipePage> {
     try {
       DataSnapshot snapshot = await _resepRef.get();
       if (snapshot.exists) {
-        setState(() {
+        setState(() async {
           judul = snapshot.child('judul').value as String? ?? "Default Judul";
           deskripsi = snapshot.child('deskripsi').value as String? ??
               "Default Deskripsi";
@@ -296,6 +307,17 @@ class _RecipePageState extends State<RecipePage> {
             String nama = entry.child('nama').value as String? ?? '';
             String komen = entry.child('komen').value as String? ?? '';
             komentar[entry.key ?? ''] = {'nama': nama, 'komen': komen};
+          }
+
+          // Periksa apakah resep sudah diarsipkan oleh user yang sedang login
+          if (isLoggedIn) {
+            print('User sedang login: $_username');
+            DatabaseEvent bookmarkSnapshot = await _profileRef
+                .child(_username!)
+                .child('archive')
+                .child('resep${widget.recipeKey}')
+                .once();
+            isBookmarked = true;
           }
 
           print(langkah);
@@ -362,7 +384,7 @@ class _RecipePageState extends State<RecipePage> {
               ),
               onPressed: () {
                 print(isBookmarked);
-                // archiveRecipe(widget.recipeKey);
+                archiveRecipe(_username!, widget.recipeKey);
                 // _archiveRecipe(widget.user, widget.recipeKey);
               },
             ),
@@ -697,7 +719,7 @@ class _RecipePageState extends State<RecipePage> {
                         ),
                         SizedBox(width: 5),
                         Text(
-                          "1",
+                          komentar.length.toString(),
                           style: const TextStyle(
                             color: Colors.black,
                             fontSize: 12.0,
