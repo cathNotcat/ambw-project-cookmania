@@ -273,8 +273,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 10.0),
                   GestureDetector(
                     onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const HomePage()));
+                      // Navigator.of(context).push(MaterialPageRoute(
+                      //     builder: (context) => const HomePage()));
                     },
                     child: Text(
                       'Skip',

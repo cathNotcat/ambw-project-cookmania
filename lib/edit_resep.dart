@@ -102,11 +102,11 @@ class _EditRecipeState extends State<EditRecipe> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Resep berhasil dihapus')),
       );
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => const HomePage(),
-        ),
-      );
+      // Navigator.of(context).push(
+      //   MaterialPageRoute(
+      //     builder: (context) => const HomePage(),
+      //   ),
+      // );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Gagal menghapus resep: $e')),
