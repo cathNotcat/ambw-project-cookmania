@@ -8,6 +8,7 @@ Fitur<br />
 - Tambah, edit, lihat dan delete resep
 - Search resep berdasarkan nama masakan
 - Archive dan unarchive
-- Register dan login
+- Register, login dan logout
 - Filter berdasarkan negara dan nama bahan
+- Menambahkan komen pada masing-masing resep
 
