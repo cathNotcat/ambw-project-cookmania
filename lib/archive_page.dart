@@ -1,8 +1,6 @@
 import 'package:cookmania/home_page.dart';
 import 'package:cookmania/profilepage/profile_page.dart';
-import 'package:cookmania/recipe_page_fix.dart';
 import 'package:cookmania/search/searchKetik_page.dart';
-import 'package:cookmania/profilepage/login_page.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,9 +32,7 @@ class _ArchivePageState extends State<ArchivePage> {
     setState(() {
       _username = prefs.getString('username');
       print('username: $_username');
-      if (_username != null) {
-        _getData();
-      }
+      _getData();
     });
   }
 
@@ -78,7 +74,6 @@ class _ArchivePageState extends State<ArchivePage> {
                 'judul': judul,
                 'foto': 'lib/images/$foto',
                 'creator': '@$creatorUsername',
-                'recipeKey': value.toString(),
               });
             });
           } else {
@@ -89,137 +84,87 @@ class _ArchivePageState extends State<ArchivePage> {
     }
   }
 
-  void _navigateToRecipePage(String recipeKey) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => RecipePage(
-          user: _username!,
-          recipeKey: recipeKey,
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _username == null
-          ? Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Silakan login dahulu',
-                      style: TextStyle(fontSize: 18.0),
-                    ),
-                    const SizedBox(height: 20.0),
-                    Container(
-                      width: double.infinity,
-                      child: FilledButton(
-                        onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => const LoginPage()));
-                        },
-                        style: FilledButton.styleFrom(
-                            backgroundColor: Colors.yellow[800],
-                            foregroundColor: Colors.black),
-                        child: const Text("Login"),
-                      ),
-                    ),
-                  ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                "COOKMANIA",
+                style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20.0),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Resep Tersimpan",
+                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
                 ),
               ),
-            )
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "COOKMANIA",
-                      style: TextStyle(
-                          fontSize: 22.0, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 20.0),
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Resep Tersimpan",
-                        style: TextStyle(
-                            fontSize: 18.0, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    const SizedBox(height: 20.0),
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10.0,
-                        mainAxisSpacing: 10.0,
-                      ),
-                      itemCount: _resepList.length,
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: () => _navigateToRecipePage(
-                              _resepList[index]['recipeKey']!),
-                          child: Card(
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: ClipRRect(
-                                    borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(10.0),
-                                        topRight: Radius.circular(10.0)),
-                                    child: Image.network(
-                                      _resepList[index]['foto']!,
-                                      height: 120,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 8.0, right: 8.0, top: 8.0),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      _resepList[index]['creator']!,
-                                      style: const TextStyle(
-                                          color: Colors.black45,
-                                          fontSize: 12.0),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 8.0, right: 8.0, bottom: 10.0),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      _resepList[index]['judul']!,
-                                      style: const TextStyle(
-                                          fontSize: 16.0,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ),
-                              ],
+              const SizedBox(height: 20.0),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10.0,
+                  mainAxisSpacing: 10.0,
+                ),
+                itemCount: _resepList.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    child: Column(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(10.0),
+                                topRight: Radius.circular(10.0)),
+                            child: Image.network(
+                              _resepList[index]['foto']!,
+                              height: 120,
+                              fit: BoxFit.cover,
                             ),
                           ),
-                        );
-                      },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 8.0, right: 8.0, top: 8.0),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              _resepList[index]['creator']!,
+                              style: const TextStyle(
+                                  color: Colors.black45, fontSize: 12.0),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 8.0, right: 8.0, bottom: 10.0),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              _resepList[index]['judul']!,
+                              style: const TextStyle(
+                                  fontSize: 16.0, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
-            ),
+            ],
+          ),
+        ),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(

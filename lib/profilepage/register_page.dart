@@ -7,6 +7,7 @@ class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _RegisterPageState createState() => _RegisterPageState();
 }
 
@@ -59,9 +60,9 @@ class _RegisterPageState extends State<RegisterPage> {
         dynamic snapshotValue = event.snapshot.value;
         if (snapshotValue != null && snapshotValue is Map<dynamic, dynamic>) {
           userExists = true;
-          setState(() {
-            _usernameError = 'Username tidak tersedia';
-          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Username tidak tersedia.')),
+          );
         }
       });
 
@@ -74,9 +75,9 @@ class _RegisterPageState extends State<RegisterPage> {
           dynamic snapshotValue = event.snapshot.value;
           if (snapshotValue != null && snapshotValue is Map<dynamic, dynamic>) {
             userExists = true;
-            setState(() {
-              _emailError = 'Email tidak tersedia';
-            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Email tidak tersedia.')),
+            );
           }
         });
       }
@@ -88,7 +89,6 @@ class _RegisterPageState extends State<RegisterPage> {
           'email': email,
           'username': username,
           'password': password,
-          'foto': 'foto.png',
         }).then((value) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Register berhasil.')),
@@ -141,7 +141,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       if (value == null || value.isEmpty) {
                         return 'Silakan isi nama anda';
                       }
-                      return null;
+                      return _emailError;
                     },
                   ),
                   const SizedBox(height: 10.0),
@@ -161,49 +161,47 @@ class _RegisterPageState extends State<RegisterPage> {
                       if (value == null || value.isEmpty) {
                         return 'Silakan isi kota anda';
                       }
-                      return null;
+                      return _emailError;
                     },
                   ),
                   const SizedBox(height: 10.0),
                   // ----------------------------------USERNAME----------------------------------
                   TextFormField(
                     controller: _usernameController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Username',
-                      border: const OutlineInputBorder(),
-                      focusedBorder: const OutlineInputBorder(
+                      border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           color: Color.fromRGBO(249, 168, 37, 1),
                         ),
                       ),
-                      errorText: _usernameError,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Silakan isi username anda';
                       }
-                      return null;
+                      return _usernameError;
                     },
                   ),
                   const SizedBox(height: 10.0),
                   // ----------------------------------EMAIL----------------------------------
                   TextFormField(
                     controller: _emailController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Email',
-                      border: const OutlineInputBorder(),
-                      focusedBorder: const OutlineInputBorder(
+                      border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           color: Color.fromRGBO(249, 168, 37, 1),
                         ),
                       ),
-                      errorText: _emailError,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Silakan isi email anda';
                       }
-                      return null;
+                      return _emailError;
                     },
                   ),
                   const SizedBox(height: 10.0),
