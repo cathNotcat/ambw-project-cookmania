@@ -1,15 +1,13 @@
 import 'package:cookmania/archive_page.dart';
-import 'package:cookmania/homepage/kategori.dart';
 import 'package:cookmania/homepage/pilihan_bahan.dart';
 import 'package:cookmania/homepage/pilihan_negara.dart';
 import 'package:cookmania/profilepage/profile_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cookmania/search/searchKetik_page.dart'; // Import the SearchKetikPage
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
-  final String userId;
-
-  const HomePage({Key? key, required this.userId}) : super(key: key);
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -17,11 +15,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int pilihanMenu = 0;
-
   final _japanController = PageController();
   final _koreaController = PageController();
   final _italyController = PageController();
-
   final List<String> bahanIMG = <String>[
     "chicken.png",
     "beef.png",
@@ -38,6 +34,13 @@ class _HomePageState extends State<HomePage> {
     "Kepiting",
     "Udang"
   ];
+  String? _username;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUsername();
+  }
 
   @override
   void dispose() {
@@ -45,6 +48,14 @@ class _HomePageState extends State<HomePage> {
     _koreaController.dispose();
     _italyController.dispose();
     super.dispose();
+  }
+
+  void _loadUsername() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _username = prefs.getString('username');
+      print('username: $_username');
+    });
   }
 
   @override
@@ -69,7 +80,8 @@ class _HomePageState extends State<HomePage> {
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => SearchKetikPage(userId: widget.userId),
+                      builder: (context) =>
+                          SearchKetikPage(userId: _username.toString()),
                     ),
                   );
                 },
@@ -94,7 +106,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(height: 20.0),
-              
               // ----------------------------------TAB BAR----------------------------------
               const Align(
                 alignment: Alignment.centerLeft,
@@ -142,7 +153,8 @@ class _HomePageState extends State<HomePage> {
             case 1:
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => SearchKetikPage(userId: widget.userId),
+                  builder: (context) =>
+                      SearchKetikPage(userId: _username.toString()),
                 ),
               );
               break;
