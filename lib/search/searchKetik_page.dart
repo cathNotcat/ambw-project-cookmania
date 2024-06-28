@@ -4,7 +4,9 @@ import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:cookmania/search/searchResult_page.dart';
 
 class SearchKetikPage extends StatefulWidget {
-  const SearchKetikPage({Key? key}) : super(key: key);
+  final String userId;
+  
+  const SearchKetikPage({Key? key, required this.userId}) : super(key: key);
 
   @override
   _SearchKetikPageState createState() => _SearchKetikPageState();
@@ -26,7 +28,6 @@ class _SearchKetikPageState extends State<SearchKetikPage> {
   void _loadInitialData() {
     _resepRef
         .orderByChild('nama')
-        .limitToFirst(10)
         .onValue
         .listen((event) {
       List<Map<dynamic, dynamic>> initialResults = [];
@@ -42,6 +43,9 @@ class _SearchKetikPageState extends State<SearchKetikPage> {
               }
             }
           });
+
+          // Sort the initial results by the first letter of 'nama'
+          initialResults.sort((a, b) => a['nama'].toLowerCase().compareTo(b['nama'].toLowerCase()));
         }
       }
       setState(() {
@@ -137,11 +141,11 @@ class _SearchKetikPageState extends State<SearchKetikPage> {
         if (index < _initialResults.length) {
           final resep = _initialResults[index];
           return ListTile(
-            title: Text(resep['nama'] ?? ''),
+            title: Text(capitalizeEachWord(resep['nama'] ?? '')),
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => SearchResultPage(nama: resep['nama']?? '')),
+                MaterialPageRoute(builder: (context) => SearchResultPage(userId:widget.userId, nama: resep['nama']?? '')),
               );
             },
           );
@@ -159,11 +163,11 @@ class _SearchKetikPageState extends State<SearchKetikPage> {
         if (index < _searchResults.length) {
           final resep = _searchResults[index];
           return ListTile(
-            title: Text(resep['nama'] ?? ''),
+            title: Text(capitalizeEachWord(resep['nama'] ?? '')),
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => SearchResultPage(nama: resep['nama'] ?? '')),
+                MaterialPageRoute(builder: (context) => SearchResultPage(userId:widget.userId, nama: resep['nama'] ?? '')),
               );
             },
           );
@@ -174,3 +178,12 @@ class _SearchKetikPageState extends State<SearchKetikPage> {
     );
   }
 }
+
+String capitalizeEachWord(String input) {
+  if (input.isEmpty) return input;
+  return input.split(' ').map((word) {
+    if (word.isEmpty) return word;
+    return word[0].toUpperCase() + word.substring(1).toLowerCase();
+  }).join(' ');
+}
+

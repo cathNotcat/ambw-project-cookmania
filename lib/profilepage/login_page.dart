@@ -48,12 +48,13 @@ class _LoginPageState extends State<LoginPage> {
 
           if (userId != null) {
             SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.setString('username', username);
+            // await prefs.setString('username', username);
+            await prefs.setString('userId', userId!);
 
             // ignore: use_build_context_synchronously
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => const HomePage(),
+                builder: (context) => HomePage(userId: userId!),
               ),
             );
           } else {
@@ -181,7 +182,7 @@ class _LoginPageState extends State<LoginPage> {
                 GestureDetector(
                   onTap: () {
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const HomePage()));
+                        builder: (context) => const HomePage(userId:"")));
                   },
                   child: Text(
                     'Skip',

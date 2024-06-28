@@ -1,4 +1,5 @@
 import 'package:cookmania/archive_page.dart';
+import 'package:cookmania/homepage/kategori.dart';
 import 'package:cookmania/homepage/pilihan_bahan.dart';
 import 'package:cookmania/homepage/pilihan_negara.dart';
 import 'package:cookmania/profilepage/profile_page.dart';
@@ -6,7 +7,9 @@ import 'package:cookmania/search/searchKetik_page.dart'; // Import the SearchKet
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final String userId;
+
+  const HomePage({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -66,7 +69,7 @@ class _HomePageState extends State<HomePage> {
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => const SearchKetikPage(),
+                      builder: (context) => SearchKetikPage(userId: widget.userId),
                     ),
                   );
                 },
@@ -91,83 +94,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(height: 20.0),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    OutlinedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey[300],
-                        shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10.0))),
-                      ),
-                      child: const Text(
-                        'Ayam',
-                        style: TextStyle(color: Colors.black),
-                      ),
-                    ),
-                    const SizedBox(width: 8.0),
-                    OutlinedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey[300],
-                        shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10.0))),
-                      ),
-                      child: const Text(
-                        'Ikan',
-                        style: TextStyle(color: Colors.black),
-                      ),
-                    ),
-                    const SizedBox(width: 8.0),
-                    OutlinedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey[300],
-                        shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10.0))),
-                      ),
-                      child: const Text(
-                        'Keju',
-                        style: TextStyle(color: Colors.black),
-                      ),
-                    ),
-                    const SizedBox(width: 8.0),
-                    OutlinedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey[300],
-                        shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10.0))),
-                      ),
-                      child: const Text(
-                        'Cokelat',
-                        style: TextStyle(color: Colors.black),
-                      ),
-                    ),
-                    const SizedBox(width: 8.0),
-                    OutlinedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey[300],
-                        shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10.0))),
-                      ),
-                      child: const Text(
-                        'Tepung',
-                        style: TextStyle(color: Colors.black),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20.0),
+              
               // ----------------------------------TAB BAR----------------------------------
               const Align(
                 alignment: Alignment.centerLeft,
@@ -215,7 +142,7 @@ class _HomePageState extends State<HomePage> {
             case 1:
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => const SearchKetikPage(),
+                  builder: (context) => SearchKetikPage(userId: widget.userId),
                 ),
               );
               break;

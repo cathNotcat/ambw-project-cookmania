@@ -1,4 +1,6 @@
+import 'package:cookmania/homepage/kategori.dart';
 import 'package:flutter/material.dart';
+import 'kategori.dart';
 
 class PilihanBahan extends StatelessWidget {
   final List<String> bahanIMG = [
@@ -31,14 +33,23 @@ class PilihanBahan extends StatelessWidget {
         mainAxisSpacing: 10,
         crossAxisCount: 3,
         children: List.generate(bahanIMG.length, (index) {
-          return Container(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset('lib/images/${bahanIMG[index]}', height: 70),
-                Text(bahanText[index]),
-              ],
+          return GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => KategoriPage(kategori: bahanText[index]),
+                ),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset('lib/images/${bahanIMG[index]}', height: 70),
+                  Text(bahanText[index]),
+                ],
+              ),
             ),
           );
         }),

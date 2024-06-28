@@ -237,18 +237,18 @@ class _ArchivePageState extends State<ArchivePage> {
         onTap: (int index) {
           switch (index) {
             case 0:
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const HomePage(),
-                ),
-              );
+              // Navigator.of(context).push(
+              //   MaterialPageRoute(
+              //     builder: (context) => const HomePage(),
+              //   ),
+              // );
               break;
             case 1:
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const SearchKetikPage(),
-                ),
-              );
+              // Navigator.of(context).push(
+              //   MaterialPageRoute(
+              //     builder: (context) => const SearchKetikPage(),
+              //   ),
+              // );
               break;
             case 2:
               break;
