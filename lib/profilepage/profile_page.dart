@@ -105,36 +105,38 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // ----------------------------------TITLE----------------------------------
-            const Center(
-              child: Text(
-                "COOKMANIA",
-                style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              // ----------------------------------TITLE----------------------------------
+              const Center(
+                child: Text(
+                  "COOKMANIA",
+                  style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+                ),
               ),
-            ),
-            const SizedBox(height: 20.0),
-            FutureBuilder<Map<String, String>>(
-              future: _dataFuture,
-              builder: (context, snapshot) {
-                if (_username == null) {
-                  return _loggedOut();
-                } else {
-                  return _loggedIn(snapshot.data!);
-                }
-                // if (snapshot.hasError) {
-                //   return Center(child: Text('Error: ${snapshot.error}'));
-                // } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                //   return _loggedOut();
-                // } else {
-                //   return _loggedIn(snapshot.data!);
-                // }
-              },
-            ),
-          ],
+              const SizedBox(height: 20.0),
+              FutureBuilder<Map<String, String>>(
+                future: _dataFuture,
+                builder: (context, snapshot) {
+                  if (_username == null) {
+                    return _loggedOut();
+                  } else {
+                    return _loggedIn(snapshot.data!);
+                  }
+                  // if (snapshot.hasError) {
+                  //   return Center(child: Text('Error: ${snapshot.error}'));
+                  // } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  //   return _loggedOut();
+                  // } else {
+                  //   return _loggedIn(snapshot.data!);
+                  // }
+                },
+              ),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -324,7 +326,8 @@ class _ResepWidgetState extends State<ResepWidget> {
       context,
       MaterialPageRoute(
         builder: (context) =>
-            RecipePage(user: widget.username, recipeKey: recipeKey),
+            RecipePage(
+            recipeKey: recipeKey),
       ),
     );
   }
