@@ -4,7 +4,9 @@ import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:cookmania/search/searchResult_page.dart';
 
 class SearchKetikPage extends StatefulWidget {
-  const SearchKetikPage({Key? key}) : super(key: key);
+  final String userId;
+  
+  const SearchKetikPage({Key? key, required this.userId}) : super(key: key);
 
   @override
   _SearchKetikPageState createState() => _SearchKetikPageState();
@@ -143,7 +145,7 @@ class _SearchKetikPageState extends State<SearchKetikPage> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => SearchResultPage(nama: resep['nama']?? '')),
+                MaterialPageRoute(builder: (context) => SearchResultPage(userId:widget.userId, nama: resep['nama']?? '')),
               );
             },
           );
@@ -165,7 +167,7 @@ class _SearchKetikPageState extends State<SearchKetikPage> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => SearchResultPage(nama: resep['nama'] ?? '')),
+                MaterialPageRoute(builder: (context) => SearchResultPage(userId:widget.userId, nama: resep['nama'] ?? '')),
               );
             },
           );

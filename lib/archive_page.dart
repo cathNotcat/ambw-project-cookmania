@@ -189,11 +189,11 @@ class _ArchivePageState extends State<ArchivePage> {
               // );
               break;
             case 1:
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const SearchKetikPage(),
-                ),
-              );
+              // Navigator.of(context).push(
+              //   MaterialPageRoute(
+              //     builder: (context) => const SearchKetikPage(),
+              //   ),
+              // );
               break;
             case 2:
               break;

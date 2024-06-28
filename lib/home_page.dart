@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> {
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => const SearchKetikPage(),
+                      builder: (context) => SearchKetikPage(userId: widget.userId),
                     ),
                   );
                 },
@@ -142,7 +142,7 @@ class _HomePageState extends State<HomePage> {
             case 1:
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => const SearchKetikPage(),
+                  builder: (context) => SearchKetikPage(userId: widget.userId),
                 ),
               );
               break;

@@ -4,8 +4,9 @@ import 'package:cookmania/recipe_page_fix.dart';
 
 class SearchResultPage extends StatefulWidget {
   final String nama;
+  final String userId;
 
-  const SearchResultPage({Key? key, required this.nama}) : super(key: key);
+  const SearchResultPage({Key? key, required this.userId, required this.nama}) : super(key: key);
 
   @override
   _SearchResultPageState createState() => _SearchResultPageState();
@@ -201,7 +202,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => RecipePage(user: "user1", recipeKey: resepKey),
+        builder: (context) => RecipePage(user: widget.userId, recipeKey: resepKey),
       ),
     );
   }
