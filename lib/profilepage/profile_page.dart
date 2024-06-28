@@ -1,8 +1,8 @@
 import 'package:cookmania/archive_page.dart';
+import 'package:cookmania/edit_resep.dart';
 import 'package:cookmania/home_page.dart';
 import 'package:cookmania/profilepage/login_page.dart';
 import 'package:cookmania/profilepage/register_page.dart';
-import 'package:cookmania/recipe_page_fix.dart';
 import 'package:cookmania/search/searchKetik_page.dart';
 import 'package:cookmania/upload_recipe_fix.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -301,14 +301,14 @@ class _ResepWidgetState extends State<ResepWidget> {
   void _navigateToRecipePage(int index) {
     String recipeKey = widget.details[index]['recipeKey']!;
 
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) =>
-    //         RecipePage(
-    //         recipeKey: recipeKey),
-    //   ),
-    // );
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            EditRecipe(
+            recipeKey: recipeKey),
+      ),
+    );
   }
 
   @override

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cookmania/profilepage/profile_page.dart';
 
 class UploadRecipe extends StatefulWidget {
   const UploadRecipe({super.key});
@@ -56,7 +57,7 @@ class _UploadRecipeState extends State<UploadRecipe> {
   @override
   void initState() {
     super.initState();
-  _loadUsername() ;
+    _loadUsername();
     // print('user: ${widget.user}');
 
     // _getRecipeCount();s
@@ -108,7 +109,7 @@ class _UploadRecipeState extends State<UploadRecipe> {
     int duration = int.tryParse(_durationController.text) ?? 0;
     int kalori = int.tryParse(_kaloriController.text) ?? 0;
 
-    print("cek pckd:  $cost   $duration $kalori $porsi" );
+    print("cek pckd:  $cost   $duration $kalori $porsi");
 
     Map<String, dynamic> ingredientsMap = {};
     for (int i = 1; i < _ingredients.length; i++) {
@@ -141,7 +142,7 @@ class _UploadRecipeState extends State<UploadRecipe> {
       'porsi': porsi,
       'durasi': duration,
       'kalori': kalori,
-      // 'id_creator': widget.user,
+      'id_creator': _username,
       'komentar': komentar,
       'foto': "default.png",
       'tanggal': formattedDate,
@@ -150,6 +151,11 @@ class _UploadRecipeState extends State<UploadRecipe> {
       // Berhasil menyimpan
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Resep berhasil diunggah')),
+      );
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const ProfilePage(),
+        ),
       );
       // Reset input setelah disimpan
       _titleController.clear();

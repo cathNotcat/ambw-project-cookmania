@@ -1,6 +1,7 @@
 // import 'dart:js_interop';
 
 import 'package:cookmania/home_page.dart';
+import 'package:cookmania/profilepage/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:intl/intl.dart';
@@ -102,6 +103,11 @@ class _EditRecipeState extends State<EditRecipe> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Resep berhasil dihapus')),
       );
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const ProfilePage(),
+        ),
+      );
       // Navigator.of(context).push(
       //   MaterialPageRoute(
       //     builder: (context) => const HomePage(),
@@ -175,6 +181,11 @@ class _EditRecipeState extends State<EditRecipe> {
     _recipeRef.child(widget.recipeKey).update(updatedFields).then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Resep berhasil diperbarui')),
+      );
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const ProfilePage(),
+        ),
       );
     }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(

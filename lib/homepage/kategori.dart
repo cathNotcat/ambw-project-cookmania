@@ -20,6 +20,7 @@ class _KategoriPageState extends State<KategoriPage> {
     _resepFuture = _getResepData();
   }
 
+
   Future<List<Map<String, String>>> _getResepData() async {
     print('Querying for category: ${widget.kategori}');
     DataSnapshot snapshot = await _dbResepRef.orderByChild('kategori').equalTo(widget.kategori.toLowerCase()).get();
