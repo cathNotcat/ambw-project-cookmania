@@ -6,6 +6,7 @@ import 'package:cookmania/profilepage/login_page.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cookmania/upload_recipe_fix.dart';
 
 class ArchivePage extends StatefulWidget {
   const ArchivePage({super.key});
@@ -94,7 +95,6 @@ class _ArchivePageState extends State<ArchivePage> {
       context,
       MaterialPageRoute(
         builder: (context) => RecipePage(
-          user: _username!,
           recipeKey: recipeKey,
         ),
       ),
@@ -231,26 +231,32 @@ class _ArchivePageState extends State<ArchivePage> {
           BottomNavigationBarItem(
               label: "Archive", icon: Icon(Icons.bookmark_outline)),
           BottomNavigationBarItem(
-              label: "Profile", icon: Icon(Icons.person_outline)),
+              label: "Profile", icon: Icon(Icons.person_2_outlined)),
         ],
         currentIndex: 3,
         onTap: (int index) {
           switch (index) {
             case 0:
-              // Navigator.of(context).push(
-              //   MaterialPageRoute(
-              //     builder: (context) => const HomePage(),
-              //   ),
-              // );
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => HomePage(),
+                ),
+              );
               break;
             case 1:
-              // Navigator.of(context).push(
-              //   MaterialPageRoute(
-              //     builder: (context) => const SearchKetikPage(),
-              //   ),
-              // );
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) =>
+                      SearchKetikPage(),
+                ),
+              );
               break;
             case 2:
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const UploadRecipe(),
+                ),
+              );
               break;
             case 3:
               break;

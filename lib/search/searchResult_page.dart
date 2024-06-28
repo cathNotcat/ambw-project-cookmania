@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:cookmania/recipe_page_fix.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchResultPage extends StatefulWidget {
   final String nama;
-  final String userId;
 
-  const SearchResultPage({Key? key, required this.userId, required this.nama}) : super(key: key);
+  const SearchResultPage({Key? key, required this.nama}) : super(key: key);
 
   @override
   _SearchResultPageState createState() => _SearchResultPageState();
@@ -20,11 +20,21 @@ class _SearchResultPageState extends State<SearchResultPage> {
       .child('profile'); // Reference to profile node
   List<Map<dynamic, dynamic>> _searchResults = [];
   bool _isLoading = true;
+  String? _username;
 
   @override
   void initState() {
+    _loadUsername();
     super.initState();
     _loadSearchResults();
+  }
+
+  void _loadUsername() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _username = prefs.getString('username');
+      print('username: $_username');
+    });
   }
 
   void _loadSearchResults() {
@@ -179,11 +189,6 @@ class _SearchResultPageState extends State<SearchResultPage> {
                 ],
               ),
             ),
-            Positioned(
-              bottom: 8,
-              right: 8,
-              child: Icon(Icons.bookmark_border, size: 35.0),
-            ),
           ],
         ),
       ),
@@ -202,7 +207,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => RecipePage(user: widget.userId, recipeKey: resepKey),
+        builder: (context) => RecipePage(recipeKey: resepKey),
       ),
     );
   }

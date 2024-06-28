@@ -147,7 +147,7 @@ class _PageViewWidgetState extends State<PageViewWidget> {
       context,
       MaterialPageRoute(
         builder: (context) =>
-            RecipePage(user: widget.username, recipeKey: recipeKey),
+            RecipePage(recipeKey: recipeKey),
       ),
     );
   }

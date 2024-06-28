@@ -6,10 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:flutter/widgets.dart';
 
 class RecipePage extends StatefulWidget {
-  final String user;
   final String recipeKey;
 
-  const RecipePage({super.key, required this.user, required this.recipeKey});
+  const RecipePage({super.key, required this.recipeKey});
 
   @override
   State<RecipePage> createState() => _RecipePageState();
@@ -363,7 +362,7 @@ class _RecipePageState extends State<RecipePage> {
               ),
               onPressed: () {
                 print(isBookmarked);
-                archiveRecipe(widget.user, widget.recipeKey);
+                // archiveRecipe(widget.recipeKey);
                 // _archiveRecipe(widget.user, widget.recipeKey);
               },
             ),

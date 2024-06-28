@@ -2,6 +2,7 @@ import 'package:cookmania/archive_page.dart';
 import 'package:cookmania/homepage/pilihan_bahan.dart';
 import 'package:cookmania/homepage/pilihan_negara.dart';
 import 'package:cookmania/profilepage/profile_page.dart';
+import 'package:cookmania/upload_recipe_fix.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cookmania/search/searchKetik_page.dart'; // Import the SearchKetikPage
 import 'package:flutter/material.dart';
@@ -81,7 +82,7 @@ class _HomePageState extends State<HomePage> {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) =>
-                          SearchKetikPage(userId: _username.toString()),
+                          SearchKetikPage(),
                     ),
                   );
                 },
@@ -154,16 +155,16 @@ class _HomePageState extends State<HomePage> {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) =>
-                      SearchKetikPage(userId: _username.toString()),
+                      SearchKetikPage(),
                 ),
               );
               break;
             case 2:
-              // Navigator.of(context).push(
-              //   MaterialPageRoute(
-              //     builder: (context) => UploadPage(),
-              //   ),
-              // );
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => UploadRecipe(),
+                ),
+              );
               break;
             case 3:
               Navigator.of(context).push(

@@ -3,10 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UploadRecipe extends StatefulWidget {
-  final String user;
-  const UploadRecipe({super.key, required this.user});
+  const UploadRecipe({super.key});
 
   @override
   _UploadRecipeState createState() => _UploadRecipeState();
@@ -51,15 +51,24 @@ class _UploadRecipeState extends State<UploadRecipe> {
 
   var recipeCount = 0;
   var key;
+  String? _username;
 
   @override
   void initState() {
     super.initState();
-    print('user: ${widget.user}');
+  _loadUsername() ;
+    // print('user: ${widget.user}');
 
     // _getRecipeCount();s
   }
 
+  void _loadUsername() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _username = prefs.getString('username');
+      print('username: $_username');
+    });
+  }
   // Future<void> _getRecipeCount() async {
   //   try {
   //     // Use once() to fetch a single snapshot
@@ -132,7 +141,7 @@ class _UploadRecipeState extends State<UploadRecipe> {
       'porsi': porsi,
       'durasi': duration,
       'kalori': kalori,
-      'id_creator': widget.user,
+      // 'id_creator': widget.user,
       'komentar': komentar,
       'foto': "default.png",
       'tanggal': formattedDate,
