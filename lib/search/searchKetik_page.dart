@@ -56,7 +56,7 @@ class _SearchKetikPageState extends State<SearchKetikPage> {
             }
           });
 
-          // Sort the initial results by the first letter of 'nama'
+          // urutin dari huruf pertama nama 
           initialResults.sort((a, b) => a['nama'].toLowerCase().compareTo(b['nama'].toLowerCase()));
         }
       }
