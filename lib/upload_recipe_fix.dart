@@ -5,7 +5,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:intl/intl.dart';
 
 class UploadRecipe extends StatefulWidget {
-  const UploadRecipe({Key? key}) : super(key: key);
+  final String user;
+  const UploadRecipe({super.key, required this.user});
 
   @override
   _UploadRecipeState createState() => _UploadRecipeState();
@@ -17,7 +18,7 @@ class _UploadRecipeState extends State<UploadRecipe> {
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  // final TextEditingController _countryController = TextEditingController();
+  final TextEditingController _namaMakananController = TextEditingController();
   final TextEditingController _costController = TextEditingController();
   final TextEditingController _porsiController = TextEditingController();
   final TextEditingController _durationController = TextEditingController();
@@ -54,27 +55,30 @@ class _UploadRecipeState extends State<UploadRecipe> {
   @override
   void initState() {
     super.initState();
-    _getRecipeCount();
+    print('user: ${widget.user}');
+
+    // _getRecipeCount();s
   }
 
-  Future<void> _getRecipeCount() async {
-    try {
-      // Use once() to fetch a single snapshot
-      DataSnapshot snapshot = await _allresepRef.get();
+  // Future<void> _getRecipeCount() async {
+  //   try {
+  //     // Use once() to fetch a single snapshot
+  //     DataSnapshot snapshot = await _allresepRef.get();
 
-      int count = snapshot.value != null ? (snapshot.value as Map).length : 0;
-      key = (count + 1).toString();
+  //     int count = snapshot.value != null ? (snapshot.value as Map).length : 0;
+  //     key = (count + 1).toString();
 
-      print("key" + key);
-    } catch (e) {
-      print('Error fetching recipe count: $e');
-    }
-  }
+  //     print("key" + key);
+  //   } catch (e) {
+  //     print('Error fetching recipe count: $e');
+  //   }
+  // }
 
   Future<void> _saveRecipe() async {
     // Validate input
     if (_titleController.text.isEmpty ||
         _descriptionController.text.isEmpty ||
+        _namaMakananController.text.isEmpty ||
         _costController.text.isEmpty ||
         _ingredients.isEmpty ||
         _steps.isEmpty ||
@@ -94,6 +98,8 @@ class _UploadRecipeState extends State<UploadRecipe> {
     int porsi = int.tryParse(_porsiController.text) ?? 0;
     int duration = int.tryParse(_durationController.text) ?? 0;
     int kalori = int.tryParse(_kaloriController.text) ?? 0;
+
+    print("cek pckd:  $cost   $duration $kalori $porsi" );
 
     Map<String, dynamic> ingredientsMap = {};
     for (int i = 1; i < _ingredients.length; i++) {
@@ -115,9 +121,10 @@ class _UploadRecipeState extends State<UploadRecipe> {
       '0': '', // Inisialisasi komentar dengan key 0
     };
 
-    _recipeRef.child(key).set({
+    _recipeRef.push().set({
       'judul': _titleController.text,
       'deskripsi': _descriptionController.text,
+      'nama': _namaMakananController.text,
       'negara': dropdownNegaraValue,
       'biaya': cost,
       'bahan': _ingredients,
@@ -125,7 +132,7 @@ class _UploadRecipeState extends State<UploadRecipe> {
       'porsi': porsi,
       'durasi': duration,
       'kalori': kalori,
-      'id_creator': 'user1',
+      'id_creator': widget.user,
       'komentar': komentar,
       'foto': "default.png",
       'tanggal': formattedDate,
@@ -144,6 +151,7 @@ class _UploadRecipeState extends State<UploadRecipe> {
       _porsiController.clear();
       _durationController.clear();
       _kaloriController.clear();
+      _namaMakananController.clear();
 
       setState(() {
         _ingredients.clear();
@@ -239,13 +247,42 @@ class _UploadRecipeState extends State<UploadRecipe> {
                           border: OutlineInputBorder(),
                         ),
                       ),
-
                       SizedBox(height: 16.0),
                       Row(
                         children: [
                           SizedBox(
                             width:
-                                120.0, // Tentukan lebar yang konsisten untuk teks label
+                                150.0, // Tentukan lebar yang konsisten untuk teks label
+                            child: Text(
+                              'Nama makanan',
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: TextField(
+                              controller: _namaMakananController,
+                              keyboardType: TextInputType.text,
+                              decoration: InputDecoration(
+                                hintText: 'Mie goreng',
+                                hintStyle: TextStyle(
+                                  fontSize: 16.0,
+                                  color: Colors.black38,
+                                ),
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16.0),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width:
+                                150.0, // Tentukan lebar yang konsisten untuk teks label
                             child: Text(
                               'Biaya ',
                               style: TextStyle(
@@ -275,7 +312,7 @@ class _UploadRecipeState extends State<UploadRecipe> {
                         children: [
                           SizedBox(
                             width:
-                                120.0, // Tentukan lebar yang konsisten untuk teks label
+                                150.0, // Tentukan lebar yang konsisten untuk teks label
                             child: Text(
                               'Kalori ',
                               style: TextStyle(
@@ -305,7 +342,7 @@ class _UploadRecipeState extends State<UploadRecipe> {
                         children: [
                           SizedBox(
                             width:
-                                120.0, // Tentukan lebar yang konsisten untuk teks label
+                                150.0, // Tentukan lebar yang konsisten untuk teks label
                             child: Text(
                               'Jumlah sajian ',
                               style: TextStyle(
@@ -334,7 +371,7 @@ class _UploadRecipeState extends State<UploadRecipe> {
                       Row(children: [
                         SizedBox(
                           width:
-                              120.0, // Tentukan lebar yang konsisten untuk teks label
+                              150.0, // Tentukan lebar yang konsisten untuk teks label
                           child: Text(
                             'Durasi ',
                             style: TextStyle(
@@ -363,9 +400,9 @@ class _UploadRecipeState extends State<UploadRecipe> {
                       Row(children: [
                         SizedBox(
                           width:
-                              120.0, // Tentukan lebar yang konsisten untuk teks label
+                              150.0, // Tentukan lebar yang konsisten untuk teks label
                           child: Text(
-                            'NegaraAsal ',
+                            'Negara Asal ',
                             style: TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeight.bold,
@@ -399,7 +436,7 @@ class _UploadRecipeState extends State<UploadRecipe> {
                       Row(children: [
                         SizedBox(
                           width:
-                              120.0, // Tentukan lebar yang konsisten untuk teks label
+                              150.0, // Tentukan lebar yang konsisten untuk teks label
                           child: Text(
                             'Kategori ',
                             style: TextStyle(
@@ -448,9 +485,9 @@ class _UploadRecipeState extends State<UploadRecipe> {
                         child: TextField(
                           controller: _ingredientController,
                           decoration: InputDecoration(
-                            hintText: 'Nama bahan',
+                            hintText: 'Garam',
                             hintStyle: TextStyle(
-                                fontSize: 16.0, fontWeight: FontWeight.bold),
+                                fontSize: 16.0, color: Colors.black38),
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -460,9 +497,11 @@ class _UploadRecipeState extends State<UploadRecipe> {
                         child: TextField(
                           controller: _amountController,
                           decoration: InputDecoration(
-                            hintText: 'Takaran',
+                            hintText: '1 sdt',
                             hintStyle: TextStyle(
-                                fontSize: 16.0, fontWeight: FontWeight.bold),
+                              fontSize: 16.0,
+                              color: Colors.black38,
+                            ),
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -480,6 +519,12 @@ class _UploadRecipeState extends State<UploadRecipe> {
                               _ingredientController.clear();
                               _amountController.clear();
                             });
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'Bahan dan takaran tidak boleh kosong')),
+                            );
                           }
                         },
                       ),
@@ -534,9 +579,12 @@ class _UploadRecipeState extends State<UploadRecipe> {
                       TextField(
                         controller: _stepController,
                         decoration: InputDecoration(
-                          hintText: 'Langkah-langkah',
+                          hintText:
+                              'Panaskan minyak, tumis bawang putih, hingga harum',
                           hintStyle: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.bold),
+                            fontSize: 16.0,
+                            color: Colors.black38,
+                          ),
                           border: OutlineInputBorder(),
                           suffixIcon: IconButton(
                             icon: Icon(Icons.add),
@@ -546,6 +594,12 @@ class _UploadRecipeState extends State<UploadRecipe> {
                                   _steps.add(_stepController.text);
                                   _stepController.clear();
                                 });
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content:
+                                          Text('Langkah tidak boleh kosong')),
+                                );
                               }
                             },
                           ),
