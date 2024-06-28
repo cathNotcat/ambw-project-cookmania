@@ -2,6 +2,7 @@ import 'package:cookmania/archive_page.dart';
 import 'package:cookmania/home_page.dart';
 import 'package:cookmania/profilepage/login_page.dart';
 import 'package:cookmania/profilepage/register_page.dart';
+import 'package:cookmania/recipe_page_fix.dart';
 import 'package:cookmania/search/searchKetik_page.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -66,12 +67,40 @@ class _ProfilePageState extends State<ProfilePage> {
           'judul': judul,
           'deskripsi': deskripsi,
           'foto': 'lib/images/$foto',
+          'recipeKey': entry.key!,
         };
         data['resep']?.add(item);
       }
     }
     return data;
   }
+
+  // Future<Map<String, List<Map<String, String>>>> _getResepData() async {
+  //   DataSnapshot snapshot = await _dbResepRef.get();
+  //   Map<String, List<Map<String, String>>> data = {
+  //     'resep': [],
+  //   };
+
+  //   for (var entry in snapshot.children) {
+  //     String? idCreator = entry.child('id_creator').value as String?;
+  //     String? judul = entry.child('judul').value as String?;
+  //     String? deskripsi = entry.child('deskripsi').value as String?;
+  //     String? foto = entry.child('foto').value as String?;
+
+  //     if (idCreator == _userkey &&
+  //         deskripsi != null &&
+  //         judul != null &&
+  //         foto != null) {
+  //       Map<String, String> item = {
+  //         'judul': judul,
+  //         'deskripsi': deskripsi,
+  //         'foto': 'lib/images/$foto',
+  //       };
+  //       data['resep']?.add(item);
+  //     }
+  //   }
+  //   return data;
+  // }
 
   Future<Map<String, String>> _getData() async {
     if (_username != null) {
@@ -273,7 +302,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
                 ),
                 // const SizedBox(height: 10.0),
-                ResepWidget(details: data['resep']!),
+                ResepWidget(
+                  details: data['resep']!,
+                  username: _username.toString(),
+                ),
                 const SizedBox(height: 40.0),
                 SizedBox(
                   width: double.infinity,
@@ -301,68 +333,81 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
-class ResepWidget extends StatelessWidget {
+class ResepWidget extends StatefulWidget {
   final List<Map<String, String>> details;
+  final String username;
 
-  const ResepWidget({required this.details, Key? key});
+  const ResepWidget({required this.details, required this.username, Key? key});
+
+  @override
+  State<ResepWidget> createState() => _ResepWidgetState();
+}
+
+class _ResepWidgetState extends State<ResepWidget> {
+  void _navigateToRecipePage(int index) {
+    String recipeKey = widget.details[index]['recipeKey']!;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            RecipePage(user: widget.username, recipeKey: recipeKey),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 400,
       child: ListView.builder(
-        itemCount: details.length,
+        itemCount: widget.details.length,
         itemBuilder: (context, index) {
-          if (index >= details.length) {
-            return Container();
-          }
-          return Column(
-            children: [
-              SizedBox(
-                width: double.infinity,
-                child: Card(
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            bottomLeft: Radius.circular(10)),
-                        child: Image.asset(
-                          details[index]['foto']!,
-                          width: 150,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              constraints: const BoxConstraints(maxWidth: 200),
-                              child: Text(
-                                details[index]['judul']!,
-                                style: const TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Container(
-                              constraints: const BoxConstraints(maxWidth: 200),
-                              child: Text(
-                                details[index]['deskripsi']!,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+          return GestureDetector(
+            onTap: () => _navigateToRecipePage(index),
+            child: Card(
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      bottomLeft: Radius.circular(10),
+                    ),
+                    child: Image.asset(
+                      widget.details[index]['foto']!,
+                      width: 150,
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          constraints: const BoxConstraints(maxWidth: 200),
+                          child: Text(
+                            widget.details[index]['judul']!,
+                            style: const TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          constraints: const BoxConstraints(maxWidth: 200),
+                          child: Text(
+                            widget.details[index]['deskripsi']!,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           );
         },
       ),
